@@ -59,7 +59,7 @@ public class TeacherSessionController {
                     .ifPresent(a -> recorded.put(booking.getId(), a.getStatus()));
         }
 
-        model.addAttribute("session", session);
+        model.addAttribute("classSession", session);
         model.addAttribute("bookings", bookings);
         model.addAttribute("recorded", recorded);
         model.addAttribute("statuses", AttendanceStatus.values());

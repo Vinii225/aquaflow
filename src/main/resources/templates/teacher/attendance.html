@@ -12,13 +12,13 @@
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <main class="container" style="max-width: 720px;">
-  <h1 class="h4 mb-1" th:text="${session.swimClass.name}">Turma</h1>
+  <h1 class="h4 mb-1" th:text="${classSession.swimClass.name}">Turma</h1>
   <p class="text-muted mb-3">
-    <span th:text="${#temporals.format(session.date, 'dd/MM/yyyy')}"></span> ·
-    <span th:text="${#temporals.format(session.startTime, 'HH:mm')} + ' às ' + ${#temporals.format(session.endTime, 'HH:mm')}"></span>
+    <span th:text="${#temporals.format(classSession.date, 'dd/MM/yyyy')}"></span> ·
+    <span th:text="${#temporals.format(classSession.startTime, 'HH:mm')} + ' às ' + ${#temporals.format(classSession.endTime, 'HH:mm')}"></span>
   </p>
 
-  <form th:action="@{/teacher/sessions/{id}/attendance(id=${session.id})}" method="post">
+  <form th:action="@{/teacher/sessions/{id}/attendance(id=${classSession.id})}" method="post">
     <div class="card card-aquaflow p-3 mb-3" th:each="b : ${bookings}">
       <div class="d-flex justify-content-between align-items-center">
         <strong th:text="${b.student.name}"></strong>
