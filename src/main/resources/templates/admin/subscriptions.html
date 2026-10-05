@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Assinaturas · AquaFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/aquaflow.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Assinaturas</h1>
+    <a class="btn btn-primary" th:href="@{/admin/subscriptions/new}">Nova assinatura</a>
+  </div>
+
+  <div class="table-responsive card-aquaflow p-3">
+    <table class="table table-aquaflow align-middle mb-0">
+      <thead>
+        <tr><th>Aluno</th><th>Plano</th><th>Valor mensal</th><th>Vencimento</th><th>Status</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="s : ${subscriptions.content}">
+          <td th:text="${s.student.name}"></td>
+          <td th:text="${s.planName}"></td>
+          <td th:text="'R$ ' + ${#numbers.formatDecimal(s.monthlyFee, 1, 2)}"></td>
+          <td th:text="'dia ' + ${s.dueDay}"></td>
+          <td><span class="badge" th:classappend="'badge-status-' + ${#strings.toLowerCase(s.status)}" th:text="${s.status}"></span></td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/subscriptions/{id}/edit(id=${s.id})}">Editar</a>
+            <form th:action="@{/admin/subscriptions/{id}/cancel(id=${s.id})}" method="post" class="d-inline"
+                  th:if="${s.status.name() == 'ACTIVE'}" onsubmit="return confirm('Cancelar esta assinatura?');">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Cancelar</button>
+            </form>
+          </td>
+        </tr>
+        <tr th:if="${subscriptions.empty}"><td colspan="6" class="text-center text-muted py-4">Nenhuma assinatura cadastrada.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="mt-3" th:if="${subscriptions.totalPages > 1}">
+    <ul class="pagination">
+      <li class="page-item" th:each="i : ${#numbers.sequence(0, subscriptions.totalPages - 1)}"
+          th:classappend="${i == subscriptions.number} ? 'active'">
+        <a class="page-link" th:href="@{/admin/subscriptions(page=${i})}" th:text="${i + 1}"></a>
+      </li>
+    </ul>
+  </nav>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

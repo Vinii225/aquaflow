@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Piscina · AquaFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/aquaflow.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container" style="max-width: 560px;">
+  <div class="card card-aquaflow p-4">
+    <h1 class="h4 mb-3" th:text="${pool.id} ? 'Editar piscina' : 'Nova piscina'">Piscina</h1>
+
+    <form th:action="@{/admin/pools}" th:object="${pool}" method="post">
+      <input type="hidden" th:field="*{id}">
+
+      <div class="mb-3">
+        <label class="form-label" for="name">Nome</label>
+        <input type="text" class="form-control" id="name" th:field="*{name}"
+               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
+        <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="totalLanes">Quantidade de raias</label>
+        <input type="number" min="1" class="form-control" id="totalLanes" th:field="*{totalLanes}"
+               th:classappend="${#fields.hasErrors('totalLanes')} ? 'is-invalid'">
+        <div class="invalid-feedback" th:if="${#fields.hasErrors('totalLanes')}" th:errors="*{totalLanes}"></div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="status">Status</label>
+        <select class="form-select" id="status" th:field="*{status}">
+          <option value="ACTIVE">Ativa</option>
+          <option value="MAINTENANCE">Em manutenção</option>
+          <option value="INACTIVE">Inativa</option>
+        </select>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a class="btn btn-outline-secondary" th:href="@{/admin/pools}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

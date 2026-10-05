@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chamada · AquaFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/aquaflow.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container" style="max-width: 720px;">
+  <h1 class="h4 mb-1" th:text="${session.swimClass.name}">Turma</h1>
+  <p class="text-muted mb-3">
+    <span th:text="${#temporals.format(session.date, 'dd/MM/yyyy')}"></span> ·
+    <span th:text="${#temporals.format(session.startTime, 'HH:mm')} + ' às ' + ${#temporals.format(session.endTime, 'HH:mm')}"></span>
+  </p>
+
+  <form th:action="@{/teacher/sessions/{id}/attendance(id=${session.id})}" method="post">
+    <div class="card card-aquaflow p-3 mb-3" th:each="b : ${bookings}">
+      <div class="d-flex justify-content-between align-items-center">
+        <strong th:text="${b.student.name}"></strong>
+        <select th:name="${'status_' + b.id}" class="form-select" style="width: auto;">
+          <option value="">Selecione</option>
+          <option th:each="st : ${statuses}" th:value="${st}" th:text="${st}"
+                  th:selected="${recorded[b.id] == st}"></option>
+        </select>
+      </div>
+    </div>
+
+    <p class="text-muted" th:if="${#lists.isEmpty(bookings)}">Nenhum aluno reservou esta aula.</p>
+
+    <button type="submit" class="btn btn-primary" th:if="${not #lists.isEmpty(bookings)}">
+      Salvar chamada e concluir aula
+    </button>
+  </form>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

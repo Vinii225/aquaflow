@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Grade semanal · AquaFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/aquaflow.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Grade semanal</h1>
+    <a class="btn btn-primary" th:href="@{/admin/schedules/new}">Novo horário</a>
+  </div>
+
+  <div class="table-responsive card-aquaflow p-3">
+    <table class="table table-aquaflow align-middle mb-0">
+      <thead>
+        <tr><th>Turma</th><th>Professor</th><th>Dia</th><th>Horário</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="s : ${schedules.content}">
+          <td th:text="${s.swimClass.name}"></td>
+          <td th:text="${s.teacher.name}"></td>
+          <td th:text="${dayNames[s.dayOfWeek]}"></td>
+          <td th:text="${#temporals.format(s.startTime, 'HH:mm')} + ' às ' + ${#temporals.format(s.endTime, 'HH:mm')}"></td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-secondary" th:href="@{/admin/schedules/{id}/edit(id=${s.id})}">Editar</a>
+            <form th:action="@{/admin/schedules/{id}/delete(id=${s.id})}" method="post" class="d-inline"
+                  onsubmit="return confirm('Remover este horário?');">
+              <button type="submit" class="btn btn-sm btn-outline-danger">Remover</button>
+            </form>
+          </td>
+        </tr>
+        <tr th:if="${schedules.empty}"><td colspan="5" class="text-center text-muted py-4">Nenhum horário cadastrado.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="mt-3" th:if="${schedules.totalPages > 1}">
+    <ul class="pagination">
+      <li class="page-item" th:each="i : ${#numbers.sequence(0, schedules.totalPages - 1)}"
+          th:classappend="${i == schedules.number} ? 'active'">
+        <a class="page-link" th:href="@{/admin/schedules(page=${i})}" th:text="${i + 1}"></a>
+      </li>
+    </ul>
+  </nav>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

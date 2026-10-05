@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Horário · AquaFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/aquaflow.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container" style="max-width: 560px;">
+  <div class="card card-aquaflow p-4">
+    <h1 class="h4 mb-3" th:text="${classSchedule.id} ? 'Editar horário' : 'Novo horário'">Horário</h1>
+
+    <form th:action="@{/admin/schedules}" th:object="${classSchedule}" method="post">
+      <input type="hidden" th:field="*{id}">
+
+      <div class="mb-3">
+        <label class="form-label" for="swimClass">Turma</label>
+        <select class="form-select" id="swimClass" th:field="*{swimClass}">
+          <option th:each="c : ${classes}" th:value="${c.id}" th:text="${c.name}"></option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="teacher">Professor</label>
+        <select class="form-select" id="teacher" th:field="*{teacher}">
+          <option th:each="t : ${teachers}" th:value="${t.id}" th:text="${t.name}"></option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="dayOfWeek">Dia da semana</label>
+        <select class="form-select" id="dayOfWeek" th:field="*{dayOfWeek}">
+          <option th:each="i : ${#numbers.sequence(1, 7)}" th:value="${i}" th:text="${dayNames[i]}"></option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="col mb-3">
+          <label class="form-label" for="startTime">Início</label>
+          <input type="time" class="form-control" id="startTime" th:field="*{startTime}"
+                 th:classappend="${#fields.hasErrors('startTime')} ? 'is-invalid'">
+          <div class="invalid-feedback" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
+        </div>
+        <div class="col mb-3">
+          <label class="form-label" for="endTime">Término</label>
+          <input type="time" class="form-control" id="endTime" th:field="*{endTime}"
+                 th:classappend="${#fields.hasErrors('endTime')} ? 'is-invalid'">
+          <div class="invalid-feedback" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a class="btn btn-outline-secondary" th:href="@{/admin/schedules}">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
