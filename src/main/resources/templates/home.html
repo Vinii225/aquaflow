@@ -12,10 +12,23 @@
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<main class="container">
+<main class="container pb-5">
   <section class="hero-aquaflow p-5 mb-5">
     <h1 class="display-5 fw-bold" th:text="${schoolName}">AquaFlow Escola de Natação</h1>
-    <p class="lead mb-0">Aulas de natação para todas as idades, em um ambiente seguro e acolhedor.</p>
+    <p class="lead mb-4">Aulas de natação para todas as idades, em um ambiente seguro e acolhedor.</p>
+    <a class="btn btn-accent btn-lg" th:href="@{/register}">Matricule-se</a>
+  </section>
+
+  <section class="row g-3 gallery-aquaflow mb-5">
+    <div class="col-md-4">
+      <img th:src="@{/img/gallery-swimmer.jpg}" alt="Aluno nadando crawl em raia da piscina">
+    </div>
+    <div class="col-md-4">
+      <img th:src="@{/img/gallery-dive.jpg}" alt="Aluno mergulhando na piscina">
+    </div>
+    <div class="col-md-4">
+      <img th:src="@{/img/gallery-pool.jpg}" alt="Piscina da escola">
+    </div>
   </section>
 
   <div class="row g-4 mb-5">
@@ -64,7 +77,5 @@
     </div>
   </div>
 </main>
-
-<div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>
