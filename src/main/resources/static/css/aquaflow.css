@@ -142,6 +142,49 @@ body {
   outline-offset: 2px;
 }
 
+.split-auth {
+  min-height: 100vh;
+}
+
+.split-auth-media {
+  position: relative;
+  background-size: cover;
+  background-position: top center;
+  background-attachment: fixed;
+  min-height: 280px;
+}
+
+.split-auth-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 116, 144, 0.55) 0%, rgba(8, 51, 68, 0.75) 100%);
+}
+
+.split-auth-media-content {
+  position: relative;
+  z-index: 1;
+  color: #FFFFFF;
+}
+
+.split-auth-form {
+  background-color: var(--color-background);
+}
+
+.split-auth-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+@media (max-width: 767.98px) {
+  .split-auth-media {
+    min-height: 200px;
+    background-attachment: scroll;
+  }
+}
+
 .badge-status-active,
 .badge-status-confirmed,
 .badge-status-paid,
