@@ -266,6 +266,54 @@ a {
 }
 
 .footer-aquaflow {
-  color: var(--color-muted-foreground);
-  border-top: 1px solid var(--color-border);
+  background-color: var(--color-primary-dark);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.footer-brand {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.footer-muted {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.9rem;
+}
+
+.footer-heading {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.55);
+  margin-bottom: 0.9rem;
+}
+
+.footer-links li {
+  margin-bottom: 0.55rem;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.78);
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--color-accent);
+}
+
+.footer-links i {
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 0.2rem;
+}
+
+.footer-bottom {
+  background-color: rgba(0, 0, 0, 0.18);
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.6);
 }

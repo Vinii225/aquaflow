@@ -52,7 +52,7 @@
     </div>
   </section>
 
-  <div class="row g-4 mb-5">
+  <div id="horarios" class="row g-4 mb-5">
     <div class="col-md-4">
       <div class="card card-aquaflow h-100 p-4">
         <h2 class="h5 d-flex align-items-center gap-2"><i class="bi bi-calendar3 icon-accent"></i> Horários de funcionamento</h2>
@@ -79,7 +79,7 @@
       </div>
     </div>
 
-    <div class="col-md-4">
+    <div id="endereco" class="col-md-4">
       <div class="card card-aquaflow h-100 p-4">
         <h2 class="h5 d-flex align-items-center gap-2"><i class="bi bi-geo-alt icon-accent"></i> Endereço e contato</h2>
         <p class="mb-2 mt-2 d-flex align-items-center gap-2">
@@ -92,7 +92,7 @@
     </div>
   </div>
 
-  <div class="row g-4 mb-3" th:if="${not #lists.isEmpty(pools)}">
+  <div id="piscinas" class="row g-4 mb-3" th:if="${not #lists.isEmpty(pools)}">
     <div class="col-12">
       <h2 class="h5 d-flex align-items-center gap-2"><i class="bi bi-droplet-half icon-accent"></i> Nossas piscinas</h2>
     </div>
@@ -104,5 +104,7 @@
     </div>
   </div>
 </main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>
