@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: aquaflow
+      POSTGRES_USER: aquaflow
+      POSTGRES_PASSWORD: aquaflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - aquaflow_db_data:/var/lib/postgresql/data
+
+volumes:
+  aquaflow_db_data:
