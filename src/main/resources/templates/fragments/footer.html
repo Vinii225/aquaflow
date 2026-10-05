@@ -23,13 +23,26 @@
       </div>
 
       <div class="col-6 col-lg-3">
-        <h2 class="footer-heading">Conta</h2>
+        <h2 class="footer-heading" sec:authorize="!isAuthenticated()">Conta</h2>
+        <h2 class="footer-heading" sec:authorize="isAuthenticated()">
+          Olá, <span sec:authentication="principal.fullName">usuário</span>
+        </h2>
         <ul class="list-unstyled footer-links">
           <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}">Entrar</a></li>
           <li sec:authorize="!isAuthenticated()"><a th:href="@{/register}">Criar conta</a></li>
-          <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/pools}">Área administrativa</a></li>
+
+          <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/sessions}">Aulas</a></li>
+          <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/invoices}">Faturas</a></li>
+          <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/users}">Usuários</a></li>
+          <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/transactions}">Caixa</a></li>
+
           <li sec:authorize="hasRole('TEACHER')"><a th:href="@{/teacher/sessions}">Minhas aulas</a></li>
+
           <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/sessions}">Aulas disponíveis</a></li>
+          <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/bookings}">Minhas reservas</a></li>
+          <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/invoices}">Minhas faturas</a></li>
+
+          <li sec:authorize="hasRole('GUARDIAN')"><a th:href="@{/}">Início</a></li>
         </ul>
       </div>
 
