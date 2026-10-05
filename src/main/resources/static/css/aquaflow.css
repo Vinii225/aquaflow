@@ -1,3 +1,5 @@
+@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
+
 :root {
   --color-primary: #0E7490;
   --color-primary-dark: #155E75;
@@ -32,6 +34,50 @@ body {
 
 .navbar-aquaflow .nav-link:hover {
   color: var(--color-accent) !important;
+}
+
+.navbar-aquaflow {
+  z-index: 1030;
+}
+
+.navbar-aquaflow .nav-link {
+  font-weight: 500;
+}
+
+.user-menu-toggle::after {
+  display: none;
+}
+
+.user-menu-toggle {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem 0.35rem 0.6rem !important;
+  transition: background-color 0.15s ease;
+}
+
+.user-menu-toggle:hover,
+.user-menu-toggle:focus {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+
+.user-menu {
+  min-width: 240px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 12px 28px -14px rgba(15, 23, 42, 0.35);
+  margin-top: 0.5rem;
+}
+
+.user-menu .dropdown-item {
+  cursor: pointer;
+}
+
+.role-badge {
+  background-color: var(--color-muted);
+  color: var(--color-primary-dark);
+  font-weight: 600;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .btn-primary {
