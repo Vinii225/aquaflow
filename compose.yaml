@@ -6,9 +6,28 @@ services:
       POSTGRES_USER: aquaflow
       POSTGRES_PASSWORD: aquaflow
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - aquaflow_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aquaflow -d aquaflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: aquaflow
+      DB_PASSWORD: aquaflow
+      DB_NAME: aquaflow
+    ports:
+      - "${APP_PORT:-8080}:8080"
 
 volumes:
   aquaflow_db_data:

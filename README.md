@@ -1,28 +1,26 @@
-# AquaFlow — MVP
+# AquaFlow
 
-Sistema de gestão para escola de natação (projeto acadêmico). Esta é a primeira versão funcional: gestão de piscinas, turmas, grade semanal, geração de aulas, reservas de alunos, chamada de presença e financeiro (assinaturas, faturas e pagamento manual).
+Sistema de gestão para escola de natação: piscinas, turmas, grade de horários, geração de aulas, reservas de alunos, chamada de presença e financeiro (assinaturas, faturas, pagamento manual).
 
 ## Stack
 
-- Java 21, Spring Boot 3.3, Spring MVC + Thymeleaf
-- Spring Data JPA, Spring Security 6 (login por formulário, papéis por escola)
-- PostgreSQL + Flyway
-- Bootstrap 5
-- Maven
+Java 21 · Spring Boot 3 · Thymeleaf · Spring Security · PostgreSQL · Flyway · Docker
 
-## Como rodar localmente
+## Como rodar
 
-Pré-requisitos: Java 21 e Docker.
+Pré-requisito: Docker.
 
 ```bash
-docker compose up -d
-
-./mvnw spring-boot:run
+docker compose up -d --build
 ```
 
-A aplicação sobe em `http://localhost:8080`. O Flyway cria o schema e popula dados de demonstração automaticamente na primeira subida.
+A aplicação sobe em `http://localhost:8080`. O schema do banco e os dados de demonstração são criados automaticamente na primeira subida (via Flyway).
 
-> Use Java 21 para compilar — o Lombok ainda não suporta versões de JDK mais novas que a 21 nesta máquina; se o `java -version` padrão do seu ambiente for diferente, aponte o `JAVA_HOME` para uma instalação 21 antes de rodar o Maven.
+Para derrubar tudo:
+
+```bash
+docker compose down
+```
 
 ## Login de demonstração
 
@@ -30,49 +28,34 @@ A aplicação sobe em `http://localhost:8080`. O Flyway cria o schema e popula d
 | --- | --- | --- |
 | Administrador | admin@aquaflow.com | admin123 |
 | Professor | ricardo@aquaflow.com | professor123 |
-| Professor | ana@aquaflow.com | professor123 |
 | Aluno | aluno@aquaflow.com | aluno123 |
 
-Qualquer pessoa também pode criar uma conta de aluno em `/register`.
+Também é possível criar uma conta de aluno em `/register`.
 
-## Fluxo sugerido para testar
+## Fluxo rápido para testar
 
-1. Entrar como admin e conferir piscinas/turmas/grade já cadastradas (dados fictícios).
-2. Em **Aulas**, clicar em "Gerar próximas semanas" para criar as aulas concretas a partir da grade.
-3. Entrar como aluno e reservar uma vaga em **Aulas disponíveis**.
-4. Entrar como professor e fazer a chamada da aula em **Minhas aulas**.
-5. Como admin, em **Faturas**, gerar as faturas do mês e registrar um pagamento.
-
-## O que está implementado
-
-- Login/cadastro com papéis (administrador, professor, aluno) — responsável (guardian) existe no modelo de dados mas ainda sem tela própria.
-- CRUD de piscinas, turmas e grade semanal.
-- Geração de aulas a partir da grade (idempotente).
-- Reserva de vaga com controle de capacidade e cancelamento.
-- Chamada de presença por aula.
-- Assinaturas, geração de faturas do mês e registro manual de pagamento (gera lançamento no livro-caixa).
-- Página institucional pública com horários, professores e piscinas.
-
-## O que ficou fora do MVP
-
-- Tela de responsáveis (guardian) vendo os filhos vinculados.
-- Reposição de aula (`makeup`) automatizada.
-- Loja de produtos e pagamento online (Nuvem Pago/Pix) — está fora do escopo desta fase, conforme o pitch original do time.
-- Multi-tenant real: o MVP assume uma única escola (uma linha em `tenants`), criada pela migration de seed.
+1. Entrar como admin → **Aulas** → "Gerar próximas semanas" (cria as aulas a partir da grade).
+2. Entrar como aluno → **Aulas disponíveis** → reservar uma vaga.
+3. Entrar como professor → **Minhas aulas** → "Fazer chamada".
+4. Como admin → **Faturas** → gerar faturas do mês e registrar um pagamento.
 
 ## Estrutura
 
 ```
 src/main/java/br/edu/aquaflow/
-  domain/          entidades JPA (13 tabelas do modelo de BD)
-  repository/      Spring Data JPA
-  security/        UserDetails e autenticação
-  service/         regras de negócio (agenda, reserva, chamada, financeiro)
-  web/             controllers MVC (publico, admin, professor, aluno)
+  domain/        entidades JPA
+  repository/     Spring Data JPA
+  security/       autenticação e papéis
+  service/        regras de negócio (agenda, reserva, chamada, financeiro)
+  web/            controllers (público, admin, professor, aluno)
 src/main/resources/
-  db/migration/    Flyway (schema + dados de demonstração)
-  templates/       Thymeleaf
-  static/css/      paleta e estilos
+  db/migration/   Flyway (schema + dados de demonstração)
+  templates/      Thymeleaf
+  static/         CSS e imagens
 ```
 
-A modelagem de banco usada como base está em `Docs/mvp` (fornecida pela equipe de BD).
+A modelagem de banco usada como base está em `Docs/mvp`.
+
+## Fora do escopo desta fase
+
+Loja de produtos, pagamento online, tela de responsáveis (guardian) e multi-tenant real (o MVP assume uma única escola).
