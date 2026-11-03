@@ -6,7 +6,7 @@
 ![Spring Boot 3](https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F?logo=springboot&logoColor=white)
 ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
 
-Sistema de gestão para escola de natação: página institucional, planos mensais, piscinas, turmas, grade de horários, reservas de alunos, chamada de presença e financeiro.
+Sistema de gestão para escola de natação: página institucional, planos mensais, loja, piscinas, turmas, grade de horários, reservas de alunos, chamada de presença e financeiro.
 
 **Homologação:** https://aquaflow-9h8a.onrender.com
 
@@ -14,15 +14,16 @@ Sistema de gestão para escola de natação: página institucional, planos mensa
 
 ![Página inicial](docs/screenshots/home.webp)
 
-| Planos mensais | Login |
+| Planos mensais | Loja |
 | --- | --- |
-| ![Planos](docs/screenshots/planos.webp) | ![Login](docs/screenshots/login.webp) |
+| ![Planos](docs/screenshots/planos.webp) | ![Loja](docs/screenshots/loja.webp) |
 
 ## Funcionalidades
 
 **Público**
-- Página institucional: horários de funcionamento, professores, endereço/contato e piscinas
+- Página inicial: turmas e horários, resumo dos planos, professores, piscinas e contato (tudo vindo do banco)
 - Planos mensais (`/planos`) lado a lado, com plano em destaque e "Falar com o vendedor"
+- Loja (`/loja`): catálogo de equipamentos por categoria, com o desconto de aluno de cada plano
 - Cadastro e login de aluno
 
 **Por papel**
@@ -101,7 +102,7 @@ Também dá para criar uma conta de aluno em `/register`.
 ./mvnw verify
 ```
 
-Os testes sobem a aplicação inteira contra um PostgreSQL real com [Testcontainers](https://testcontainers.com/) (precisa de Docker rodando) e rodam todas as migrations. Eles verificam as páginas públicas, os planos vindos do banco, a proteção das áreas restritas e o login.
+Os testes sobem a aplicação inteira contra um PostgreSQL real com [Testcontainers](https://testcontainers.com/) (precisa de Docker rodando) e rodam todas as migrations. Eles verificam as páginas públicas (home, planos e loja com dados do banco), a proteção das áreas restritas e o login. Há também testes unitários para a lógica de tela que não depende do banco.
 
 ## CI/CD
 
@@ -124,19 +125,23 @@ Para o GitHub disparar o deploy só depois do CI, copie o **Deploy Hook** do ser
 
 ```
 src/main/java/br/edu/aquaflow/
-  config/        Spring Security
+  config/        Spring Security e configurações tipadas (AquaflowProperties)
   domain/        entidades JPA e enums
   repository/    Spring Data JPA
   security/      autenticação e papéis
   service/       regras de negócio (agenda, reserva, chamada, financeiro, contato)
+    site/        montagem das telas públicas (home e loja)
   web/           controllers (público, admin, professor, aluno, plataforma)
 src/main/resources/
-  db/migration/  Flyway (schema, dados de demonstração, planos, mensagens)
-  templates/     Thymeleaf
+  db/migration/  Flyway (schema, dados de demonstração, planos, mensagens, produtos)
+  templates/     Thymeleaf (fragments/ tem head, navbar, footer e alerts)
   static/        CSS e imagens
-src/test/        testes de integração (Testcontainers)
-.github/         CI/CD e Dependabot
+src/test/        testes de integração (Testcontainers) e unitários
+.github/         CI/CD, Dependabot e template de PR
+docs/            arquitetura, créditos das imagens e prints
 ```
+
+Antes de mexer no código, leia [docs/ARQUITETURA.md](docs/ARQUITETURA.md) (camadas, onde fica cada coisa, regras de migration) e [CONTRIBUTING.md](CONTRIBUTING.md) (branches, commits e PRs).
 
 ## Equipe
 
@@ -145,7 +150,7 @@ Planejamento e sprints no [Trello](https://trello.com/b/EetgQnZH/aquaflow-projet
 | Integrante | Papel |
 | --- | --- |
 | Vinícius Ares | Product Owner · deploy |
-| Emanoel Barreto | Scrum Master (Sprint 3) |
+| Emanoel Barreto | Scrum Master (Sprint 3) · catálogo de produtos |
 | Igor Andrade | Desenvolvimento · planos mensais |
 | Luis Eduardo | Desenvolvimento · banco de dados |
 | Ramotep Lopes | Desenvolvimento · planos de gerenciamento |
@@ -154,6 +159,11 @@ Planejamento e sprints no [Trello](https://trello.com/b/EetgQnZH/aquaflow-projet
 
 - [x] MVP: página institucional, agenda, reservas, chamada e financeiro
 - [x] Planos mensais (PB-01)
-- [ ] Catálogo de produtos de natação (PB-03)
+- [x] Catálogo de produtos de natação: listagem (PB-03)
+- [ ] Busca e filtro no catálogo (PB-03)
 - [ ] Contratação de plano com pagamento online (PB-02)
 - [ ] Carrinho e checkout (PB-04)
+
+## Créditos
+
+Fotos dos produtos: Wikimedia Commons. Autores e licenças em [docs/CREDITOS.md](docs/CREDITOS.md).
