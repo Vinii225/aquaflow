@@ -1,17 +1,33 @@
 version: 2
 updates:
+  # Só minor e patch: major (ex.: Spring Boot 3 -> 4) é migração planejada, não atualização automática
   - package-ecosystem: maven
     directory: /
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+    groups:
+      maven:
+        patterns: ["*"]
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]
 
+  # A versão do Java (17) é decisão do time: as imagens só recebem atualizações dentro da mesma tag
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      - dependency-name: "eclipse-temurin"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "maven"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]

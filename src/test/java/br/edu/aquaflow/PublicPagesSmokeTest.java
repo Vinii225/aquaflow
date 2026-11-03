@@ -51,6 +51,23 @@ class PublicPagesSmokeTest {
     }
 
     @Test
+    void homeAgrupaOsDiasDaMesmaTurmaEMostraOPrecoInicial() throws Exception {
+        mvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Terça e Quinta")))
+                .andExpect(content().string(containsString("99,90")));
+    }
+
+    @Test
+    void lojaEPublicaEListaProdutosComDescontoDosPlanos() throws Exception {
+        mvc.perform(get("/loja"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Óculos de natação")))
+                .andExpect(content().string(containsString("Nadadeiras de treino")))
+                .andExpect(content().string(containsString("Regular 10%")));
+    }
+
+    @Test
     void paginasDeAutenticacaoAbrem() throws Exception {
         mvc.perform(get("/login")).andExpect(status().isOk());
         mvc.perform(get("/register")).andExpect(status().isOk());

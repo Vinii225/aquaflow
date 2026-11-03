@@ -8,7 +8,7 @@
         <a th:href="@{/}" class="footer-brand d-inline-flex align-items-center gap-2 mb-2">
           <i class="bi bi-water"></i> AquaFlow
         </a>
-        <p class="footer-muted mb-0" th:text="${schoolName} ?: 'AquaFlow Escola de Natação'">AquaFlow Escola de Natação</p>
+        <p class="footer-muted mb-1" th:text="${schoolName}">AquaFlow Escola de Natação</p>
         <p class="footer-muted">Aulas de natação para todas as idades, em um ambiente seguro e acolhedor.</p>
       </div>
 
@@ -17,7 +17,8 @@
         <ul class="list-unstyled footer-links">
           <li><a th:href="@{/}">Início</a></li>
           <li><a th:href="@{/planos}">Planos</a></li>
-          <li><a th:href="@{/#horarios}">Horários</a></li>
+          <li><a th:href="@{/loja}">Loja</a></li>
+          <li><a th:href="@{/#horarios}">Turmas e horários</a></li>
           <li><a th:href="@{/#professores}">Professores</a></li>
           <li><a th:href="@{/#piscinas}">Piscinas</a></li>
         </ul>

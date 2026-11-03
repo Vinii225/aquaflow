@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Loja', 'Equipamentos de natação usados nas aulas da AquaFlow: óculos, toucas, pranchas, nadadeiras e mais.')}"></head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container pb-5">
+  <header class="page-head">
+    <h1>Loja</h1>
+    <p>Os equipamentos que usamos nas aulas. A compra é feita na recepção da escola.</p>
+    <p class="page-head-note" th:if="${not #lists.isEmpty(catalog.planDiscounts)}">
+      <i class="bi bi-tag" aria-hidden="true"></i>
+      Alunos têm desconto conforme o plano:
+      <th:block th:each="d, st : ${catalog.planDiscounts}"><span th:text="${d.planName} + ' ' + ${d.percent} + '%'">Regular 10%</span><th:block th:unless="${st.last}"> · </th:block></th:block>.
+      <a th:href="@{/planos}">Ver planos</a>
+    </p>
+  </header>
+
+  <section class="product-section" th:each="entry : ${catalog.productsByCategory}">
+    <h2 class="product-section-title" th:text="${entry.key.label}">Acessórios</h2>
+    <div class="row g-4">
+      <div class="col-sm-6 col-lg-4" th:each="p : ${entry.value}">
+        <article class="product-card h-100">
+          <img class="product-img" th:if="${p.imagePath}" th:src="@{${p.imagePath}}" th:alt="${p.name}"
+               width="800" height="600" loading="lazy">
+          <div class="product-body">
+            <h3 class="product-name" th:text="${p.name}">Óculos de natação</h3>
+            <p class="product-desc" th:if="${p.description}" th:text="${p.description}">Descrição</p>
+            <p class="product-price mb-0">R$ <span th:text="${#numbers.formatDecimal(p.price, 1, 'POINT', 2, 'COMMA')}">49,90</span></p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <div class="card card-aquaflow p-5 text-center" th:if="${catalog.empty}">
+    <p class="text-muted mb-0">Nenhum produto disponível no momento.</p>
+  </div>
+
+  <p class="product-credits" th:unless="${catalog.empty}">
+    Fotos: Wikimedia Commons —
+    <th:block th:each="entry, catStat : ${catalog.productsByCategory}"><th:block th:each="p, st : ${entry.value}" th:if="${p.imageCredit}"><span th:text="${p.name} + ' (' + ${p.imageCredit} + ')'">x</span><th:block th:unless="${catStat.last and st.last}">; </th:block></th:block></th:block>.
+  </p>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

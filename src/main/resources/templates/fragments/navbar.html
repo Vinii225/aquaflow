@@ -17,6 +17,8 @@
              th:classappend="${currentPath == '/'} ? 'active'" th:attr="aria-current=${currentPath == '/'} ? 'page'">Início</a></li>
         <li class="nav-item"><a class="nav-link" th:href="@{/planos}"
              th:classappend="${#strings.startsWith(currentPath, '/planos')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/planos')} ? 'page'">Planos</a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/loja}"
+             th:classappend="${#strings.startsWith(currentPath, '/loja')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/loja')} ? 'page'">Loja</a></li>
 
         <li class="nav-item" sec:authorize="hasRole('SCHOOL_ADMIN')">
           <a class="nav-link" th:href="@{/admin/pools}"
