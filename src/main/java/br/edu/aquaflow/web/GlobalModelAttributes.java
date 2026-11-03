@@ -1,35 +1,38 @@
 package br.edu.aquaflow.web;
 
+import br.edu.aquaflow.config.AquaflowProperties;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
+/** Atributos disponíveis em todos os templates (dados da escola e a rota atual). */
 @ControllerAdvice
 public class GlobalModelAttributes {
 
-    @Value("${aquaflow.school.name}")
-    private String schoolName;
+    private final AquaflowProperties.School school;
 
-    @Value("${aquaflow.school.address}")
-    private String schoolAddress;
-
-    @Value("${aquaflow.school.phone}")
-    private String schoolPhone;
+    public GlobalModelAttributes(AquaflowProperties properties) {
+        this.school = properties.school();
+    }
 
     @ModelAttribute("schoolName")
     public String schoolName() {
-        return schoolName;
+        return school.name();
     }
 
     @ModelAttribute("schoolAddress")
     public String schoolAddress() {
-        return schoolAddress;
+        return school.address();
     }
 
     @ModelAttribute("schoolPhone")
     public String schoolPhone() {
-        return schoolPhone;
+        return school.phone();
+    }
+
+    @ModelAttribute("schoolPhoneHref")
+    public String schoolPhoneHref() {
+        return school.phoneHref();
     }
 
     // Thymeleaf 3.1 nao expoe mais o request; usado para marcar o item ativo no menu

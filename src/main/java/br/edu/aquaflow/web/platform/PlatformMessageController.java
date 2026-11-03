@@ -3,7 +3,6 @@ package br.edu.aquaflow.web.platform;
 import br.edu.aquaflow.domain.ContactMessage;
 import br.edu.aquaflow.domain.User;
 import br.edu.aquaflow.domain.enums.ContactMessageStatus;
-import br.edu.aquaflow.domain.enums.MembershipStatus;
 import br.edu.aquaflow.domain.enums.TenantUserRole;
 import br.edu.aquaflow.repository.ContactMessageRepository;
 import br.edu.aquaflow.repository.TenantUserRepository;
@@ -68,10 +67,7 @@ public class PlatformMessageController {
     public String detail(@PathVariable UUID id, Model model) {
         ContactMessage contact = contactMessageService.find(id);
 
-        var schoolAdmins = tenantUserRepository.findByTenantIdAndRole(contact.getTenant().getId(), TenantUserRole.SCHOOL_ADMIN).stream()
-                .filter(tu -> tu.getStatus() == MembershipStatus.ACTIVE)
-                .map(tu -> tu.getUser())
-                .toList();
+        var schoolAdmins = tenantUserRepository.findActiveUsersByRole(contact.getTenant().getId(), TenantUserRole.SCHOOL_ADMIN);
 
         model.addAttribute("contact", contact);
         model.addAttribute("planLabel", planLabel(contact));

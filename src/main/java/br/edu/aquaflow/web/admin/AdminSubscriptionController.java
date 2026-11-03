@@ -1,7 +1,6 @@
 package br.edu.aquaflow.web.admin;
 
 import br.edu.aquaflow.domain.Subscription;
-import br.edu.aquaflow.domain.enums.MembershipStatus;
 import br.edu.aquaflow.domain.enums.SubscriptionStatus;
 import br.edu.aquaflow.domain.enums.TenantUserRole;
 import br.edu.aquaflow.repository.SubscriptionRepository;
@@ -95,10 +94,7 @@ public class AdminSubscriptionController {
     }
 
     private void addStudents(Model model) {
-        var students = tenantUserRepository.findByTenantIdAndRole(tenantContext.getTenantId(), TenantUserRole.STUDENT).stream()
-                .filter(tu -> tu.getStatus() == MembershipStatus.ACTIVE)
-                .map(tu -> tu.getUser())
-                .toList();
+        var students = tenantUserRepository.findActiveUsersByRole(tenantContext.getTenantId(), TenantUserRole.STUDENT);
         model.addAttribute("students", students);
     }
 }

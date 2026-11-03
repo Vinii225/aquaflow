@@ -1,8 +1,8 @@
 package br.edu.aquaflow.web.admin;
 
 import br.edu.aquaflow.domain.ClassSchedule;
-import br.edu.aquaflow.domain.enums.MembershipStatus;
 import br.edu.aquaflow.domain.enums.TenantUserRole;
+import br.edu.aquaflow.domain.enums.Weekday;
 import br.edu.aquaflow.repository.ClassScheduleRepository;
 import br.edu.aquaflow.repository.SwimClassRepository;
 import br.edu.aquaflow.repository.TenantUserRepository;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -44,7 +43,7 @@ public class AdminScheduleController {
     public String list(@PageableDefault(size = 10) Pageable pageable, Model model) {
         Page<ClassSchedule> schedules = classScheduleRepository.findByTenantId(tenantContext.getTenantId(), pageable);
         model.addAttribute("schedules", schedules);
-        model.addAttribute("dayNames", List.of("", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"));
+        model.addAttribute("dayNames", Weekday.labelsByNumber());
         return "admin/schedules";
     }
 
@@ -104,11 +103,8 @@ public class AdminScheduleController {
     private void addOptions(Model model) {
         var tenantId = tenantContext.getTenantId();
         model.addAttribute("classes", swimClassRepository.findByTenantIdAndDeletedAtIsNull(tenantId));
-        var teachers = tenantUserRepository.findByTenantIdAndRole(tenantId, TenantUserRole.TEACHER).stream()
-                .filter(tu -> tu.getStatus() == MembershipStatus.ACTIVE)
-                .map(tu -> tu.getUser())
-                .toList();
+        var teachers = tenantUserRepository.findActiveUsersByRole(tenantId, TenantUserRole.TEACHER);
         model.addAttribute("teachers", teachers);
-        model.addAttribute("dayNames", List.of("", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"));
+        model.addAttribute("dayNames", Weekday.labelsByNumber());
     }
 }

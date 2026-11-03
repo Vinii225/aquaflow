@@ -1,10 +1,10 @@
 package br.edu.aquaflow.web.admin;
 
+import br.edu.aquaflow.config.AquaflowProperties;
 import br.edu.aquaflow.domain.ClassSession;
 import br.edu.aquaflow.repository.ClassSessionRepository;
 import br.edu.aquaflow.service.ScheduleService;
 import br.edu.aquaflow.service.TenantContext;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -25,15 +25,16 @@ public class AdminSessionController {
     private final ScheduleService scheduleService;
     private final TenantContext tenantContext;
 
-    @Value("${aquaflow.booking.session-generation-weeks-ahead}")
-    private int weeksAhead;
+    private final int weeksAhead;
 
     public AdminSessionController(ClassSessionRepository classSessionRepository,
                                    ScheduleService scheduleService,
-                                   TenantContext tenantContext) {
+                                   TenantContext tenantContext,
+                                   AquaflowProperties properties) {
         this.classSessionRepository = classSessionRepository;
         this.scheduleService = scheduleService;
         this.tenantContext = tenantContext;
+        this.weeksAhead = properties.booking().sessionGenerationWeeksAhead();
     }
 
     @GetMapping
