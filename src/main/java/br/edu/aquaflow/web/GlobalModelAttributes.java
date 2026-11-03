@@ -1,5 +1,6 @@
 package br.edu.aquaflow.web;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,5 +30,11 @@ public class GlobalModelAttributes {
     @ModelAttribute("schoolPhone")
     public String schoolPhone() {
         return schoolPhone;
+    }
+
+    // Thymeleaf 3.1 nao expoe mais o request; usado para marcar o item ativo no menu
+    @ModelAttribute("currentPath")
+    public String currentPath(HttpServletRequest request) {
+        return request.getRequestURI().substring(request.getContextPath().length());
     }
 }
