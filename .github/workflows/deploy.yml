@@ -1,0 +1,59 @@
+name: Deploy homologação
+
+# Roda depois que o CI passa na main. Se o segredo RENDER_DEPLOY_HOOK_URL existir,
+# dispara o deploy no Render; em seguida confere se as páginas principais estão no ar.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-homologacao
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  HOMOLOG_URL: ${{ vars.HOMOLOG_URL || 'https://aquaflow-9h8a.onrender.com' }}
+
+jobs:
+  deploy:
+    name: Render + smoke test
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    environment:
+      name: homologacao
+      url: ${{ env.HOMOLOG_URL }}
+    steps:
+      - name: Disparar deploy no Render
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::notice::RENDER_DEPLOY_HOOK_URL não configurado; contando com o auto-deploy do Render."
+          else
+            curl -fsS -X POST "$HOOK" > /dev/null
+            echo "Deploy disparado."
+          fi
+
+      - name: Aguardar a versão nova subir
+        run: sleep 240
+
+      - name: Smoke test em homologação
+        run: |
+          check() {
+            for _ in $(seq 1 20); do
+              code=$(curl -s -o /dev/null -w '%{http_code}' -m 60 "$HOMOLOG_URL$1" || true)
+              if [ "$code" = "200" ]; then echo "OK  $1"; return 0; fi
+              echo "... $1 respondeu $code, tentando de novo"; sleep 15
+            done
+            echo "::error::$1 não respondeu 200"; return 1
+          }
+          check /
+          check /planos
+          check /login
+          curl -s "$HOMOLOG_URL/" | grep -q "Natação" || { echo "::error::home sem o nome da escola"; exit 1; }
