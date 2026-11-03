@@ -1,118 +1,157 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Aulas de natação para todas as idades, em um ambiente seguro e acolhedor. Veja horários, professores, piscinas e planos.">
-  <meta name="theme-color" content="#0E7490">
-  <link rel="icon" type="image/svg+xml" th:href="@{/img/favicon.svg}">
-  <title th:text="${schoolName} + ' · Início'">AquaFlow</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/css/aquaflow.css}">
-</head>
+<head th:replace="~{fragments/head :: head('Início', 'Aulas de natação para todas as idades, em um ambiente seguro e acolhedor. Veja horários, professores, piscinas e planos.')}"></head>
 <body class="home-page">
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<main class="container pb-5">
-  <section class="hero-aquaflow p-4 p-md-5 mb-4">
-    <p class="hero-kicker mb-2">
-      <i class="bi bi-water"></i> Escola de natação
-    </p>
-    <h1 class="display-5 fw-bold" th:text="${schoolName}">AquaFlow Escola de Natação</h1>
-    <p class="lead mb-4">Aulas de natação para todas as idades, em um ambiente seguro e acolhedor.</p>
-    <div class="d-flex flex-wrap gap-2">
-      <a class="btn btn-accent btn-lg" th:href="@{/register}" sec:authorize="!isAuthenticated()">
-        <i class="bi bi-person-plus-fill me-1"></i> Matricule-se
-      </a>
-      <a class="btn btn-outline-light btn-lg" th:href="@{/planos}">
-        <i class="bi bi-tags-fill me-1"></i> Ver planos
-      </a>
-    </div>
-  </section>
-
-  <section class="row g-3 text-center value-strip mb-5">
-    <div class="col-sm-4">
-      <i class="bi bi-patch-check-fill"></i>
-      <span>Professores qualificados</span>
-    </div>
-    <div class="col-sm-4">
-      <i class="bi bi-people-fill"></i>
-      <span>Turmas por idade e nível</span>
-    </div>
-    <div class="col-sm-4">
-      <i class="bi bi-shield-fill-check"></i>
-      <span>Ambiente seguro e supervisionado</span>
-    </div>
-  </section>
-
-  <section class="row g-3 gallery-aquaflow mb-5">
-    <div class="col-md-4">
-      <img th:src="@{/img/gallery-swimmer.jpg}" alt="Aluno nadando crawl em raia da piscina">
-    </div>
-    <div class="col-md-4">
-      <img th:src="@{/img/gallery-dive.jpg}" alt="Aluno mergulhando na piscina">
-    </div>
-    <div class="col-md-4">
-      <img th:src="@{/img/gallery-pool.jpg}" alt="Piscina da escola">
-    </div>
-  </section>
-
-  <div id="horarios" class="row g-4 mb-5">
-    <div class="col-md-4">
-      <div class="card card-aquaflow h-100 p-4">
-        <h2 class="h5 d-flex align-items-center gap-2"><i class="bi bi-calendar3 icon-accent"></i> Horários de funcionamento</h2>
-        <ul class="list-unstyled schedule-list mb-0 mt-2" th:if="${not #lists.isEmpty(schedules)}">
-          <li th:each="s : ${schedules}" class="d-flex gap-3 py-2">
-            <strong class="schedule-day" th:text="${dayNames[s.dayOfWeek]}">Segunda</strong>
-            <span>
-              <span class="schedule-time d-block fw-semibold" th:text="${#temporals.format(s.startTime, 'HH:mm')} + ' – ' + ${#temporals.format(s.endTime, 'HH:mm')}">07:00 – 08:00</span>
-              <span class="small text-muted" th:text="${s.swimClass.name}">Turma</span>
-            </span>
-          </li>
-        </ul>
-        <p class="text-muted mb-0" th:if="${#lists.isEmpty(schedules)}">Grade ainda não cadastrada.</p>
-      </div>
-    </div>
-
-    <div id="professores" class="col-md-4">
-      <div class="card card-aquaflow h-100 p-4">
-        <h2 class="h5 d-flex align-items-center gap-2"><i class="bi bi-people icon-accent"></i> Professores</h2>
-        <ul class="list-unstyled mb-0 mt-2" th:if="${not #lists.isEmpty(teachers)}">
-          <li th:each="t : ${teachers}" class="mb-2 d-flex align-items-center gap-2">
-            <i class="bi bi-person-circle text-muted"></i> <span th:text="${t.name}">Nome</span>
-          </li>
-        </ul>
-        <p class="text-muted mb-0" th:if="${#lists.isEmpty(teachers)}">Nenhum professor cadastrado.</p>
-      </div>
-    </div>
-
-    <div id="endereco" class="col-md-4">
-      <div class="card card-aquaflow h-100 p-4">
-        <h2 class="h5 d-flex align-items-center gap-2"><i class="bi bi-geo-alt icon-accent"></i> Endereço e contato</h2>
-        <p class="mb-2 mt-2 d-flex align-items-center gap-2">
-          <i class="bi bi-signpost-2 text-muted"></i> <span th:text="${schoolAddress}"></span>
+<main>
+  <section class="container home-hero">
+    <div class="row g-4 g-lg-5 align-items-center">
+      <div class="col-lg-6">
+        <h1 class="home-hero-title">Natação para crianças e adultos, do primeiro mergulho ao treino</h1>
+        <p class="home-hero-lead">
+          Turmas separadas por idade e nível, com professores qualificados e aulas supervisionadas do começo ao fim.
         </p>
-        <p class="mb-0 d-flex align-items-center gap-2">
-          <i class="bi bi-telephone text-muted"></i> <span th:text="${schoolPhone}"></span>
-        </p>
+        <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+          <a class="btn btn-accent btn-lg" th:href="@{/planos}">Ver planos e valores</a>
+          <a class="home-link" th:href="@{/#horarios}">Ver turmas e horários <i class="bi bi-arrow-down-short" aria-hidden="true"></i></a>
+        </div>
+        <dl class="home-facts">
+          <div th:if="${page.minPlanFee != null}">
+            <dt>Planos a partir de</dt>
+            <dd>R$ <span th:text="${#numbers.formatDecimal(page.minPlanFee, 1, 'POINT', 2, 'COMMA')}">99,90</span><small>/mês</small></dd>
+          </div>
+          <div th:if="${page.weeklyClasses > 0}">
+            <dt>Aulas na grade</dt>
+            <dd th:text="${page.weeklyClasses} + ' por semana'">3 por semana</dd>
+          </div>
+          <div th:if="${not #lists.isEmpty(page.pools)}">
+            <dt>Estrutura</dt>
+            <dd th:text="${#lists.size(page.pools)} + (${#lists.size(page.pools)} == 1 ? ' piscina' : ' piscinas')">2 piscinas</dd>
+          </div>
+        </dl>
+      </div>
+      <div class="col-lg-6">
+        <img class="home-hero-img" th:src="@{/img/hero-pool.jpg}" width="1600" height="1067"
+             alt="Aluno nadando borboleta em raia da piscina">
       </div>
     </div>
-  </div>
+  </section>
 
-  <div id="piscinas" class="row g-4 mb-3" th:if="${not #lists.isEmpty(pools)}">
-    <div class="col-12">
-      <h2 class="h5 d-flex align-items-center gap-2"><i class="bi bi-droplet-half icon-accent"></i> Nossas piscinas</h2>
+  <section id="horarios" class="home-section">
+    <div class="container">
+      <div class="home-section-head">
+        <h2>Turmas e horários</h2>
+        <p>Escolha pelo nível e pelo horário. Com a conta criada, você reserva a vaga pela área do aluno.</p>
+      </div>
+
+      <ul class="class-list list-unstyled mb-0" th:if="${not #lists.isEmpty(page.classes)}">
+        <li class="class-row" th:each="c : ${page.classes}">
+          <div class="class-info">
+            <h3 class="h5 mb-1" th:text="${c.name}">Natação Adulto - Iniciante</h3>
+            <p class="class-meta mb-0">
+              <span th:if="${c.level}" th:text="${c.level}">Iniciante</span>
+              <span th:text="${c.pool}">Piscina</span>
+              <span th:if="${c.capacity}" th:text="'Até ' + ${c.capacity} + ' alunos'">Até 10 alunos</span>
+              <span th:text="'Prof. ' + ${#strings.listJoin(c.teachers, ', ')}">Prof. Ricardo</span>
+            </p>
+          </div>
+          <ul class="class-slots list-unstyled mb-0">
+            <li th:each="slot : ${c.slots}">
+              <span class="class-slot-days" th:text="${slot.days}">Terça e Quinta</span>
+              <span class="class-slot-time" th:text="${slot.time}">07:00 – 08:00</span>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <p class="text-muted mb-0" th:if="${#lists.isEmpty(page.classes)}">A grade de horários ainda não foi cadastrada.</p>
     </div>
-    <div class="col-md-4" th:each="p : ${pools}">
-      <div class="card card-aquaflow h-100 p-4">
-        <h3 class="h6" th:text="${p.name}"></h3>
-        <p class="text-muted mb-0"><i class="bi bi-rulers"></i> <span th:text="${p.totalLanes} + ' raias'"></span></p>
+  </section>
+
+  <section class="home-section home-section-tint" th:if="${not #lists.isEmpty(page.plans)}">
+    <div class="container">
+      <div class="home-section-head d-md-flex justify-content-between align-items-end gap-4">
+        <div>
+          <h2>Planos mensais</h2>
+          <p class="mb-md-0">Todos incluem turma por idade e nível. Muda a frequência e os benefícios.</p>
+        </div>
+        <a class="home-link flex-shrink-0" th:href="@{/planos}">Comparar planos <i class="bi bi-arrow-right-short" aria-hidden="true"></i></a>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4" th:each="p : ${page.plans}">
+          <a class="plan-teaser" th:href="@{/planos}" th:classappend="${p.highlighted} ? 'plan-teaser-highlight'">
+            <span class="plan-teaser-name" th:text="${p.name}">Regular</span>
+            <span class="plan-teaser-freq" th:text="${p.classesPerWeek} + (${p.classesPerWeek} == 1 ? ' aula por semana' : ' aulas por semana')">2 aulas por semana</span>
+            <span class="plan-teaser-price">R$ <strong th:text="${#numbers.formatDecimal(p.monthlyFee, 1, 'POINT', 2, 'COMMA')}">150,00</strong>/mês</span>
+            <span class="plan-teaser-tag" th:if="${p.highlighted}">Mais escolhido</span>
+          </a>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <section class="home-section">
+    <div class="container">
+      <div class="row g-5">
+        <div id="professores" class="col-lg-5">
+          <div class="home-section-head">
+            <h2>Professores</h2>
+            <p>Quem acompanha cada turma.</p>
+          </div>
+          <ul class="teacher-list list-unstyled mb-0" th:if="${not #lists.isEmpty(page.teachers)}">
+            <li th:each="t : ${page.teachers}">
+              <span class="teacher-avatar" aria-hidden="true" th:text="${t.initials}">RL</span>
+              <div>
+                <p class="teacher-name mb-0" th:text="${t.name}">Ricardo Lima</p>
+                <p class="teacher-classes mb-0" th:if="${not #lists.isEmpty(t.classes)}" th:text="${#strings.listJoin(t.classes, ' · ')}">Natação Adulto</p>
+              </div>
+            </li>
+          </ul>
+          <p class="text-muted mb-0" th:if="${#lists.isEmpty(page.teachers)}">Nenhum professor cadastrado.</p>
+        </div>
+
+        <div id="piscinas" class="col-lg-7">
+          <div class="home-section-head">
+            <h2>Piscinas</h2>
+            <p>Raias separadas para cada turma, inclusive para as crianças.</p>
+          </div>
+          <div class="pool-grid">
+            <img class="pool-photo" th:src="@{/img/gallery-pool.jpg}" width="700" height="467" alt="Piscina da escola" loading="lazy">
+            <ul class="pool-list list-unstyled mb-0" th:if="${not #lists.isEmpty(page.pools)}">
+              <li th:each="p : ${page.pools}">
+                <span class="pool-name" th:text="${p.name}">Piscina Semiolímpica</span>
+                <span class="pool-lanes" th:text="${p.totalLanes} + (${p.totalLanes} == 1 ? ' raia' : ' raias')">6 raias</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="endereco" class="home-section home-section-tint">
+    <div class="container">
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-6">
+          <div class="home-section-head mb-3"><h2>Onde estamos</h2></div>
+          <p class="home-contact mb-2"><i class="bi bi-geo-alt" aria-hidden="true"></i> <span th:text="${schoolAddress}">Endereço</span></p>
+          <p class="home-contact mb-4">
+            <i class="bi bi-telephone" aria-hidden="true"></i>
+            <a th:href="${schoolPhoneHref}" th:text="${schoolPhone}">(83) 99999-0000</a>
+          </p>
+          <div class="d-flex flex-wrap gap-2" sec:authorize="!isAuthenticated()">
+            <a class="btn btn-primary" th:href="@{/register}">Criar conta e reservar aula</a>
+            <a class="btn btn-outline-primary" th:href="@{/login}">Já sou aluno</a>
+          </div>
+        </div>
+        <div class="col-lg-5 offset-lg-1">
+          <img class="home-contact-img" th:src="@{/img/gallery-swimmer.jpg}" width="700" height="467"
+               alt="Aluno nadando crawl em raia da piscina" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <div th:replace="~{fragments/footer :: footer}"></div>

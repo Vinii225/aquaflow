@@ -1,5 +1,3 @@
-@import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css');
-
 :root {
   --color-primary: #0E7490;
   --color-primary-dark: #155E75;
@@ -19,7 +17,7 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: var(--color-background);
   color: var(--color-foreground);
   min-height: 100vh;
@@ -180,77 +178,6 @@ body > main {
   border-radius: 0.75rem;
 }
 
-.hero-aquaflow {
-  position: relative;
-  background: linear-gradient(135deg, rgba(14, 116, 144, 0.92) 0%, rgba(6, 182, 212, 0.85) 100%),
-              url('/img/hero-pool.jpg') center 30% / cover no-repeat;
-  color: #FFFFFF;
-  border-radius: 1rem;
-  overflow: hidden;
-}
-
-.gallery-aquaflow img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 0.75rem;
-  outline: 1px solid oklch(0 0 0 / 0.1);
-  outline-offset: -1px;
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .gallery-aquaflow img {
-    transition: scale 0.25s ease-out;
-  }
-
-  .gallery-aquaflow img:hover {
-    scale: 1.02;
-  }
-}
-
-.schedule-list li + li {
-  border-top: 1px solid var(--color-border);
-}
-
-.schedule-day {
-  min-width: 4.5rem;
-}
-
-.schedule-time {
-  font-variant-numeric: tabular-nums;
-}
-
-.icon-accent {
-  color: var(--color-primary);
-}
-
-.hero-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: rgba(255, 255, 255, 0.18);
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.value-strip {
-  color: var(--color-primary-dark);
-  font-weight: 600;
-}
-
-.value-strip i {
-  display: block;
-  font-size: 1.75rem;
-  color: var(--color-accent);
-  margin-bottom: 0.35rem;
-}
-
-.home-page {
-  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
 
 .home-page h1,
 .home-page h2,
@@ -364,18 +291,6 @@ a {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
   color: #FFFFFF;
-}
-
-.plans-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  background-color: var(--color-border);
-  color: var(--color-primary-dark);
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
 }
 
 .plans-lead {
@@ -556,4 +471,423 @@ a {
 /* Âncoras (#horarios, #professores, #piscinas) não ficam escondidas atrás da navbar fixa */
 [id] {
   scroll-margin-top: 5rem;
+}
+
+/* ---------- Home ---------- */
+
+.home-page h1,
+.home-page h2,
+.home-page h3 {
+  text-wrap: balance;
+}
+
+.home-hero {
+  padding-block: 1.5rem 3.5rem;
+}
+
+.home-hero-title {
+  font-size: clamp(2.1rem, 1.4rem + 2.6vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.08;
+  color: var(--color-primary-dark);
+  margin-bottom: 1rem;
+}
+
+.home-hero-lead {
+  font-size: 1.2rem;
+  color: var(--color-muted-foreground);
+  max-width: 34rem;
+  margin-bottom: 1.75rem;
+}
+
+.home-hero-img,
+.pool-photo,
+.home-contact-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 1rem;
+  outline: 1px solid oklch(0 0 0 / 0.1);
+  outline-offset: -1px;
+}
+
+.home-hero-img {
+  aspect-ratio: 4 / 3;
+  object-position: center 35%;
+}
+
+.home-link {
+  font-weight: 700;
+  color: var(--color-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.home-link i {
+  font-size: 1.35rem;
+}
+
+@media (hover: hover) {
+  .home-link:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+  }
+}
+
+/* Fatos vindos do banco, logo abaixo das ações */
+.home-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2.5rem;
+  margin: 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.home-facts dt {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-muted-foreground);
+}
+
+.home-facts dd {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.home-facts dd small {
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+}
+
+.home-section {
+  padding-block: 3.5rem;
+}
+
+.home-section-tint {
+  background-color: var(--color-card);
+}
+
+.home-section-head {
+  margin-bottom: 1.75rem;
+}
+
+.home-section-head h2 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.home-section-head p {
+  color: var(--color-muted-foreground);
+  max-width: 40rem;
+}
+
+/* Turmas: uma lista com divisórias, não um card por turma */
+.class-list {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+}
+
+.class-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  padding: 1.25rem 1.5rem;
+}
+
+.class-row + .class-row {
+  border-top: 1px solid var(--color-border);
+}
+
+@media (min-width: 768px) {
+  .class-row {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 2rem;
+  }
+}
+
+.class-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0;
+  color: var(--color-muted-foreground);
+  font-size: 0.95rem;
+}
+
+/* Separador no fim do item: ao quebrar linha, o "·" não abre a linha seguinte */
+.class-meta span:not(:last-child)::after {
+  content: "·";
+  margin-inline: 0.5rem;
+}
+
+.class-slots li {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.class-slots li + li {
+  margin-top: 0.25rem;
+}
+
+.class-slot-days {
+  font-weight: 600;
+}
+
+.class-slot-time {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+/* Planos na home: resumo clicável que leva à comparação completa */
+.plan-teaser {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  height: 100%;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  text-decoration: none;
+}
+
+.plan-teaser-highlight {
+  border: 2px solid var(--color-accent);
+}
+
+.plan-teaser-name {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.plan-teaser-freq {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.plan-teaser-price {
+  margin-top: 0.5rem;
+  color: var(--color-muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-teaser-price strong {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.6rem;
+  color: var(--color-foreground);
+}
+
+.plan-teaser-tag {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background-color: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+}
+
+@media (hover: hover) {
+  .plan-teaser {
+    transition: box-shadow 0.2s ease-out, border-color 0.2s ease-out;
+  }
+
+  .plan-teaser:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 10px 24px -14px rgba(14, 116, 144, 0.45);
+  }
+}
+
+.teacher-list li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.teacher-list li + li {
+  margin-top: 1rem;
+}
+
+.teacher-avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: var(--color-border);
+  color: var(--color-primary-dark);
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-weight: 600;
+}
+
+.teacher-name {
+  font-weight: 700;
+}
+
+.teacher-classes {
+  color: var(--color-muted-foreground);
+  font-size: 0.95rem;
+}
+
+.pool-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 576px) {
+  .pool-grid {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: center;
+  }
+}
+
+.pool-photo {
+  aspect-ratio: 3 / 2;
+}
+
+.pool-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.75rem;
+}
+
+.pool-list li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.pool-name {
+  font-weight: 700;
+}
+
+.pool-lanes {
+  color: var(--color-muted-foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.home-contact {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1.1rem;
+}
+
+.home-contact i {
+  color: var(--color-primary);
+}
+
+.home-contact-img {
+  aspect-ratio: 3 / 2;
+}
+
+/* ---------- Páginas internas (loja) ---------- */
+
+.page-head {
+  padding-block: 1rem 2rem;
+  max-width: 44rem;
+}
+
+.page-head h1 {
+  font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+  font-weight: 700;
+  color: var(--color-primary-dark);
+}
+
+.page-head p {
+  font-size: 1.1rem;
+  color: var(--color-muted-foreground);
+}
+
+.page-head .page-head-note {
+  font-size: 0.95rem;
+  color: var(--color-foreground);
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+
+.product-section + .product-section {
+  margin-top: 3rem;
+}
+
+.product-section-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.product-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.product-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.product-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.product-desc {
+  color: var(--color-muted-foreground);
+  font-size: 0.95rem;
+  flex: 1;
+}
+
+.product-price {
+  font-variant-numeric: tabular-nums;
+  color: var(--color-muted-foreground);
+}
+
+.product-price span {
+  font-family: 'Fredoka', 'Nunito', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-foreground);
+}
+
+.product-credits {
+  margin-top: 3rem;
+  font-size: 0.8rem;
+  color: var(--color-muted-foreground);
 }

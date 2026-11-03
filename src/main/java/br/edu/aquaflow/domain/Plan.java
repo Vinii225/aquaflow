@@ -45,6 +45,12 @@ public class Plan {
     @Column(nullable = false)
     private boolean highlighted;
 
+    /** Desconto do aluno deste plano nos produtos da loja (null = sem desconto). */
+    @Min(0)
+    @Max(100)
+    @Column(name = "product_discount_percent")
+    private Short productDiscountPercent;
+
     @Column(name = "display_order", nullable = false)
     private Short displayOrder = 0;
 
@@ -62,4 +68,8 @@ public class Plan {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt = Instant.now();
+
+    public boolean hasProductDiscount() {
+        return productDiscountPercent != null && productDiscountPercent > 0;
+    }
 }
