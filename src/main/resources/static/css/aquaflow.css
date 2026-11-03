@@ -462,12 +462,6 @@ a {
   margin-top: 0.2rem;
 }
 
-.footer-bottom {
-  background-color: rgba(0, 0, 0, 0.18);
-  font-size: 0.82rem;
-  color: rgba(255, 255, 255, 0.6);
-}
-
 /* Âncoras (#horarios, #professores, #piscinas) não ficam escondidas atrás da navbar fixa */
 [id] {
   scroll-margin-top: 5rem;
