@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title th:text="${schoolName} + ' · Planos'">AquaFlow · Planos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/aquaflow.css}">
+</head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container pb-5">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <section class="text-center mb-5">
+    <p class="plans-kicker mb-2"><i class="bi bi-tags-fill"></i> Planos mensais</p>
+    <h1 class="display-6 fw-bold">Escolha o plano que combina com você</h1>
+    <p class="lead text-muted mx-auto plans-lead">
+      Compare frequência, valor e benefícios de cada plano. Todos incluem turmas por idade e nível e professores qualificados.
+    </p>
+  </section>
+
+  <div class="row g-4 justify-content-center align-items-stretch" th:if="${not #lists.isEmpty(plans)}">
+    <div class="col-md-6 col-lg-4" th:each="p : ${plans}">
+      <article class="plan-card h-100 d-flex flex-column p-4" th:classappend="${p.highlighted} ? 'plan-card-highlight'">
+        <span class="plan-ribbon" th:if="${p.highlighted}"><i class="bi bi-star-fill"></i> Mais escolhido</span>
+
+        <h2 class="h4 mb-1" th:text="${p.name}">Plano</h2>
+        <p class="plan-frequency mb-3">
+          <i class="bi bi-calendar-week"></i>
+          <span th:text="${p.classesPerWeek} + (${p.classesPerWeek} == 1 ? ' aula por semana' : ' aulas por semana')">2 aulas por semana</span>
+        </p>
+
+        <p class="plan-price mb-1">
+          <span class="plan-currency">R$</span>
+          <span class="plan-amount" th:text="${#numbers.formatDecimal(p.monthlyFee, 1, 'POINT', 2, 'COMMA')}">150,00</span>
+          <span class="plan-period">/mês</span>
+        </p>
+        <p class="text-muted small mb-4" th:if="${p.description}" th:text="${p.description}">Descrição</p>
+
+        <ul class="list-unstyled plan-features mb-4 flex-grow-1">
+          <li th:each="f : ${p.features}" class="d-flex align-items-start gap-2">
+            <i class="bi bi-check-circle-fill"></i> <span th:text="${f}">Benefício</span>
+          </li>
+        </ul>
+
+        <a sec:authorize="!isAuthenticated()" th:href="@{/register}"
+           class="btn btn-lg w-100" th:classappend="${p.highlighted} ? 'btn-accent' : 'btn-outline-primary'">
+          Quero este plano
+        </a>
+        <button type="button" sec:authorize="!isAuthenticated()" class="btn btn-link plan-seller-link w-100 mt-2"
+                data-bs-toggle="modal" data-bs-target="#contactModal"
+                th:attr="data-plan-id=${p.id},data-plan-name=${p.name}">
+          <i class="bi bi-chat-dots me-1"></i> Falar com o vendedor
+        </button>
+        <button type="button" sec:authorize="isAuthenticated()"
+                class="btn btn-lg w-100" th:classappend="${p.highlighted} ? 'btn-accent' : 'btn-outline-primary'"
+                data-bs-toggle="modal" data-bs-target="#contactModal"
+                th:attr="data-plan-id=${p.id},data-plan-name=${p.name}">
+          <i class="bi bi-chat-dots me-1"></i> Falar com o vendedor
+        </button>
+      </article>
+    </div>
+  </div>
+
+  <div class="card card-aquaflow p-5 text-center" th:if="${#lists.isEmpty(plans)}">
+    <i class="bi bi-inbox fs-1 text-muted"></i>
+    <p class="text-muted mb-0 mt-2">Nenhum plano disponível no momento. Entre em contato com a escola.</p>
+  </div>
+
+  <p class="text-center text-muted small mt-4 mb-0">
+    Valores mensais por aluno. Ficou com dúvida?
+    <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-bs-toggle="modal" data-bs-target="#contactModal">
+      Fale com um vendedor</button>.
+  </p>
+</main>
+
+<div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <form class="modal-content contact-modal" th:action="@{/planos/contato}" th:object="${contactForm}" method="post" novalidate>
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title h5 mb-0" id="contactModalTitle">Falar com o vendedor</h2>
+          <p class="small text-muted mb-0" id="contactPlanLabel"></p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <div class="modal-body">
+        <p class="small text-muted">
+          Sua mensagem chega à equipe AquaFlow, que encaminha para o responsável da escola. O retorno é feito pelo e-mail ou telefone informado.
+        </p>
+
+        <input type="hidden" th:field="*{planId}" id="contactPlanId">
+        <div class="contact-hp" aria-hidden="true">
+          <label for="website">Site</label>
+          <input type="text" th:field="*{website}" id="website" tabindex="-1" autocomplete="off">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="contactName">Nome</label>
+          <input type="text" class="form-control" id="contactName" th:field="*{name}" th:errorclass="is-invalid" maxlength="255" autocomplete="name" required>
+          <div class="invalid-feedback" th:errors="*{name}"></div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-sm-7">
+            <label class="form-label" for="contactEmail">E-mail</label>
+            <input type="email" class="form-control" id="contactEmail" th:field="*{email}" th:errorclass="is-invalid" maxlength="255" autocomplete="email" required>
+            <div class="invalid-feedback" th:errors="*{email}"></div>
+          </div>
+          <div class="col-sm-5">
+            <label class="form-label" for="contactPhone">Telefone <span class="text-muted small">(opcional)</span></label>
+            <input type="tel" class="form-control" id="contactPhone" th:field="*{phone}" th:errorclass="is-invalid" maxlength="32" autocomplete="tel">
+            <div class="invalid-feedback" th:errors="*{phone}"></div>
+          </div>
+        </div>
+        <div class="mb-1">
+          <label class="form-label" for="contactMessage">Mensagem</label>
+          <textarea class="form-control" id="contactMessage" rows="4" th:field="*{message}" th:errorclass="is-invalid" maxlength="2000" required></textarea>
+          <div class="invalid-feedback" th:errors="*{message}"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="submit" class="btn btn-accent">
+          <i class="bi bi-send me-1"></i> Enviar mensagem
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  (function () {
+    var modalEl = document.getElementById('contactModal');
+    var planIdInput = document.getElementById('contactPlanId');
+    var planLabel = document.getElementById('contactPlanLabel');
+    var messageInput = document.getElementById('contactMessage');
+
+    function planNameFor(id) {
+      var btn = id && document.querySelector('[data-plan-id="' + id + '"]');
+      return btn ? btn.getAttribute('data-plan-name') : '';
+    }
+
+    function showPlan(name) {
+      planLabel.textContent = name ? 'Plano ' + name : 'Dúvida geral sobre os planos';
+    }
+
+    modalEl.addEventListener('show.bs.modal', function (event) {
+      var trigger = event.relatedTarget;
+      if (!trigger) {
+        showPlan(planNameFor(planIdInput.value));
+        return;
+      }
+      var id = trigger.getAttribute('data-plan-id') || '';
+      var name = trigger.getAttribute('data-plan-name') || '';
+      planIdInput.value = id;
+      showPlan(name);
+      if (!messageInput.value.trim() || messageInput.dataset.autofilled === 'true') {
+        messageInput.value = name
+          ? 'Olá! Tenho interesse no plano ' + name + ' e gostaria de mais informações.'
+          : '';
+        messageInput.dataset.autofilled = 'true';
+      }
+    });
+
+    messageInput.addEventListener('input', function () {
+      messageInput.dataset.autofilled = 'false';
+    });
+
+    if (/*[[${openContactModal == true}]]*/ false) {
+      bootstrap.Modal.getOrCreateInstance(modalEl).show();
+    }
+  })();
+</script>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

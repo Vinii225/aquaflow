@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -20,9 +20,14 @@
     </p>
     <h1 class="display-5 fw-bold" th:text="${schoolName}">AquaFlow Escola de Natação</h1>
     <p class="lead mb-4">Aulas de natação para todas as idades, em um ambiente seguro e acolhedor.</p>
-    <a class="btn btn-accent btn-lg" th:href="@{/register}">
-      <i class="bi bi-person-plus-fill me-1"></i> Matricule-se
-    </a>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-accent btn-lg" th:href="@{/register}" sec:authorize="!isAuthenticated()">
+        <i class="bi bi-person-plus-fill me-1"></i> Matricule-se
+      </a>
+      <a class="btn btn-outline-light btn-lg" th:href="@{/planos}">
+        <i class="bi bi-tags-fill me-1"></i> Ver planos
+      </a>
+    </div>
   </section>
 
   <section class="row g-3 text-center value-strip mb-5">

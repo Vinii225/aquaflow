@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,11 @@ public class AquaflowUserDetailsService implements UserDetailsService {
                 .filter(tu -> tu.getStatus() == MembershipStatus.ACTIVE)
                 .map(TenantUser::getRole)
                 .map(Enum::name)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(HashSet::new));
+
+        if (user.isPlatformAdmin()) {
+            roles.add("PLATFORM_ADMIN");
+        }
 
         if (roles.isEmpty()) {
             throw new UsernameNotFoundException("Usuário sem vínculo ativo com a escola: " + email);

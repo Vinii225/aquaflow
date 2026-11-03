@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mensagem · AquaFlow</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/aquaflow.css}">
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <a class="d-inline-flex align-items-center gap-1 mb-3 text-decoration-none" th:href="@{/plataforma/mensagens}">
+    <i class="bi bi-arrow-left"></i> Voltar para mensagens
+  </a>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="card-aquaflow p-4 h-100">
+        <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+          <div>
+            <h1 class="h4 mb-1" th:text="${contact.name}">Nome</h1>
+            <p class="text-muted small mb-0">
+              <span th:text="${planLabel}"></span> · <span th:text="${contact.tenant.name}"></span>
+            </p>
+          </div>
+          <span class="badge" th:classappend="'badge-status-' + ${#strings.toLowerCase(contact.status)}" th:text="${contact.status.label}"></span>
+        </div>
+
+        <ul class="list-unstyled small mb-3">
+          <li class="mb-1"><i class="bi bi-envelope text-muted me-1"></i>
+            <a th:href="'mailto:' + ${contact.email}" th:text="${contact.email}"></a></li>
+          <li class="mb-1" th:if="${contact.phone}"><i class="bi bi-telephone text-muted me-1"></i>
+            <span th:text="${contact.phone}"></span></li>
+          <li class="mb-1"><i class="bi bi-clock text-muted me-1"></i>
+            Recebida em <span th:text="${#temporals.format(contact.createdAt, 'dd/MM/yyyy HH:mm')}"></span></li>
+          <li th:if="${contact.sender != null}"><i class="bi bi-person-check text-muted me-1"></i>
+            Enviada por usuário logado</li>
+        </ul>
+
+        <div class="message-body p-3" th:text="${contact.message}">Mensagem</div>
+
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <form th:if="${contact.status.name() != 'ARCHIVED'}" th:action="@{/plataforma/mensagens/{id}/status(id=${contact.id})}" method="post">
+            <input type="hidden" name="status" value="ARCHIVED">
+            <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-archive me-1"></i> Arquivar</button>
+          </form>
+          <form th:if="${contact.status.name() != 'NEW'}" th:action="@{/plataforma/mensagens/{id}/status(id=${contact.id})}" method="post">
+            <input type="hidden" name="status" value="NEW">
+            <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="bi bi-envelope me-1"></i> Marcar como nova</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card-aquaflow p-4 mb-4" th:if="${contact.forwardedAt != null}">
+        <h2 class="h6 mb-2"><i class="bi bi-check2-circle text-success me-1"></i> Encaminhada</h2>
+        <p class="small mb-1">
+          Para <strong th:text="${contact.forwardedTo}"></strong>
+          em <span th:text="${#temporals.format(contact.forwardedAt, 'dd/MM/yyyy HH:mm')}"></span>
+          <span th:if="${contact.forwardedBy != null}" th:text="'por ' + ${contact.forwardedBy.name}"></span>
+        </p>
+        <p class="small text-muted mb-0" th:if="${contact.forwardNote}" th:text="${contact.forwardNote}"></p>
+      </div>
+
+      <div class="card-aquaflow p-4">
+        <h2 class="h6 mb-3">Encaminhar para a escola</h2>
+
+        <div class="mb-3" th:if="${not #lists.isEmpty(schoolAdmins)}">
+          <p class="small text-muted mb-2">Responsáveis cadastrados na escola:</p>
+          <ul class="list-unstyled small mb-2">
+            <li th:each="a : ${schoolAdmins}" class="mb-1">
+              <strong th:text="${a.name}"></strong> ·
+              <a th:href="'mailto:' + ${a.email}" th:text="${a.email}"></a>
+              <span th:if="${a.phone}" th:text="' · ' + ${a.phone}"></span>
+            </li>
+          </ul>
+          <a class="btn btn-sm btn-outline-primary" th:href="${forwardMailto}">
+            <i class="bi bi-envelope-arrow-up me-1"></i> Abrir e-mail com a mensagem
+          </a>
+        </div>
+        <p class="small text-muted" th:if="${#lists.isEmpty(schoolAdmins)}">
+          Nenhum administrador ativo cadastrado nessa escola.
+        </p>
+
+        <hr>
+
+        <form th:action="@{/plataforma/mensagens/{id}/forward(id=${contact.id})}" th:object="${forwardForm}" method="post">
+          <p class="small text-muted mb-2">Depois de repassar, registre aqui para controle da equipe.</p>
+          <div class="mb-3">
+            <label class="form-label" for="forwardedTo">Encaminhada para</label>
+            <select class="form-select" id="forwardedTo" th:field="*{forwardedTo}" required>
+              <option value="">Selecione…</option>
+              <option th:each="t : ${forwardTargets}" th:value="${t}" th:text="${t}">Dono da escola</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="note">Observação <span class="text-muted small">(opcional)</span></label>
+            <textarea class="form-control" id="note" rows="2" maxlength="1000" th:field="*{note}"
+                      placeholder="Ex.: enviado por WhatsApp para a Maria"></textarea>
+          </div>
+          <button type="submit" class="btn btn-accent w-100">
+            <i class="bi bi-send-check me-1"></i> Registrar encaminhamento
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -16,6 +16,7 @@
         <h2 class="footer-heading">Escola</h2>
         <ul class="list-unstyled footer-links">
           <li><a th:href="@{/}">Início</a></li>
+          <li><a th:href="@{/planos}">Planos</a></li>
           <li><a th:href="@{/#horarios}">Horários</a></li>
           <li><a th:href="@{/#professores}">Professores</a></li>
           <li><a th:href="@{/#piscinas}">Piscinas</a></li>
@@ -30,6 +31,8 @@
         <ul class="list-unstyled footer-links">
           <li sec:authorize="!isAuthenticated()"><a th:href="@{/login}">Entrar</a></li>
           <li sec:authorize="!isAuthenticated()"><a th:href="@{/register}">Criar conta</a></li>
+
+          <li sec:authorize="hasRole('PLATFORM_ADMIN')"><a th:href="@{/plataforma/mensagens}">Mensagens</a></li>
 
           <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/sessions}">Aulas</a></li>
           <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/invoices}">Faturas</a></li>
