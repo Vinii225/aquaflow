@@ -12,6 +12,7 @@
   --color-muted: #F0FDFF;
   --color-muted-foreground: #475569;
   --color-border: #CFFAFE;
+  --color-input-border: #64748B;
   --color-success: #16A34A;
   --color-warning: #F59E0B;
   --color-danger: #DC2626;
@@ -21,10 +22,29 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: var(--color-background);
   color: var(--color-foreground);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Rodapé encosta no fim da tela mesmo em páginas curtas */
+body > main {
+  flex: 1 0 auto;
+}
+
+.footer-aquaflow {
+  margin-top: auto;
+}
+
+/* Borda dos campos com contraste mínimo de 3:1 contra o fundo */
+.form-control,
+.form-select {
+  border-color: var(--color-input-border);
 }
 
 .navbar-aquaflow {
   background-color: var(--color-primary);
+  z-index: 1030;
 }
 
 .navbar-aquaflow .navbar-brand,
@@ -32,16 +52,30 @@ body {
   color: #FFFFFF !important;
 }
 
-.navbar-aquaflow .nav-link:hover {
-  color: var(--color-accent) !important;
-}
-
-.navbar-aquaflow {
-  z-index: 1030;
-}
-
 .navbar-aquaflow .nav-link {
   font-weight: 500;
+}
+
+/* Página atual: sublinhado em laranja, não depende só de cor */
+.navbar-aquaflow .nav-link.active {
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.45rem;
+}
+
+.navbar-aquaflow .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.navbar-aquaflow .navbar-toggler-icon {
+  filter: invert(1);
+}
+
+@media (hover: hover) {
+  .navbar-aquaflow .nav-link:hover {
+    color: var(--color-accent) !important;
+  }
 }
 
 .user-menu-toggle::after {
@@ -55,9 +89,15 @@ body {
   transition: background-color 0.15s ease;
 }
 
-.user-menu-toggle:hover,
-.user-menu-toggle:focus {
+.user-menu-toggle:focus-visible,
+.user-menu-toggle[aria-expanded="true"] {
   background-color: rgba(255, 255, 255, 0.22);
+}
+
+@media (hover: hover) {
+  .user-menu-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.22);
+  }
 }
 
 .user-menu {
@@ -98,9 +138,40 @@ body {
   font-weight: 600;
 }
 
-.btn-accent:hover {
+.btn-accent:focus-visible,
+.btn-accent:active {
   background-color: #EA580C;
+  border-color: #EA580C;
   color: #FFFFFF;
+}
+
+@media (hover: hover) {
+  .btn-accent:hover {
+    background-color: #EA580C;
+    border-color: #EA580C;
+    color: #FFFFFF;
+  }
+}
+
+.btn-link {
+  color: var(--color-primary);
+}
+
+/* Feedback de clique: botão encolhe um pouco ao ser pressionado */
+.btn {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn {
+    transition-property: color, background-color, border-color, box-shadow, scale;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+
+  .btn:not(:disabled):not(.disabled):active {
+    scale: 0.96;
+  }
 }
 
 .card-aquaflow {
@@ -123,21 +194,30 @@ body {
   height: 220px;
   object-fit: cover;
   border-radius: 0.75rem;
-  border: 1px solid var(--color-border);
-  transition: transform 0.25s ease;
+  outline: 1px solid oklch(0 0 0 / 0.1);
+  outline-offset: -1px;
 }
 
-.gallery-aquaflow img:hover {
-  transform: scale(1.02);
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .gallery-aquaflow img {
+    transition: scale 0.25s ease-out;
+  }
+
+  .gallery-aquaflow img:hover {
+    scale: 1.02;
+  }
 }
 
-.card-aquaflow {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.schedule-list li + li {
+  border-top: 1px solid var(--color-border);
 }
 
-.card-aquaflow:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 24px -12px rgba(14, 116, 144, 0.35);
+.schedule-day {
+  min-width: 4.5rem;
+}
+
+.schedule-time {
+  font-variant-numeric: tabular-nums;
 }
 
 .icon-accent {
@@ -307,12 +387,16 @@ a {
   background-color: var(--color-card);
   border: 1px solid var(--color-border);
   border-radius: 1rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.plan-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 24px -12px rgba(14, 116, 144, 0.35);
+@media (hover: hover) {
+  .plan-card {
+    transition: box-shadow 0.2s ease-out;
+  }
+
+  .plan-card:hover {
+    box-shadow: 0 10px 24px -12px rgba(14, 116, 144, 0.35);
+  }
 }
 
 .plan-card-highlight {
@@ -351,6 +435,7 @@ a {
 }
 
 .plan-amount {
+  font-variant-numeric: tabular-nums;
   font-family: 'Fredoka', 'Nunito', sans-serif;
   font-size: 2.5rem;
   font-weight: 700;
@@ -376,14 +461,20 @@ a {
   text-decoration: none;
 }
 
-.plan-seller-link:hover {
-  color: var(--color-primary-dark);
-  text-decoration: underline;
+@media (hover: hover) {
+  .plan-seller-link:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+  }
 }
 
 .contact-modal {
   border: 1px solid var(--color-border);
   border-radius: 1rem;
+}
+
+.modal-dialog-scrollable .modal-body {
+  overscroll-behavior: contain;
 }
 
 .contact-hp {
@@ -445,8 +536,10 @@ a {
   text-decoration: none;
 }
 
-.footer-links a:hover {
-  color: var(--color-accent);
+@media (hover: hover) {
+  .footer-links a:hover {
+    color: var(--color-accent);
+  }
 }
 
 .footer-links i {
@@ -458,4 +551,9 @@ a {
   background-color: rgba(0, 0, 0, 0.18);
   font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.6);
+}
+
+/* Âncoras (#horarios, #professores, #piscinas) não ficam escondidas atrás da navbar fixa */
+[id] {
+  scroll-margin-top: 5rem;
 }
