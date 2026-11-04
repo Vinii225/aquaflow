@@ -19,6 +19,10 @@
 
       <h1 class="h4 mb-3">Entrar</h1>
 
+      <div class="alert alert-info small" th:if="${enrollmentPending}">
+        <i class="bi bi-bag-check me-1" aria-hidden="true"></i> Entre para concluir a contratação do plano. Ainda não tem conta? Crie uma abaixo: depois do login você volta direto para o pagamento.
+      </div>
+
       <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"></div>
       <div class="alert alert-danger" th:if="${param.error}">E-mail ou senha inválidos.</div>
 
