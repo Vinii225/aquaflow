@@ -1246,11 +1246,6 @@ a {
   color: var(--color-foreground);
 }
 
-.product-credits {
-  margin-top: 3rem;
-  font-size: 0.8rem;
-  color: var(--color-muted-foreground);
-}
 
 /* Painéis do admin e do professor */
 .dash-head {

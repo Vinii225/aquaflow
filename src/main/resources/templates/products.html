@@ -54,11 +54,6 @@
   <div class="card card-aquaflow p-5 text-center" th:if="${catalog.empty}">
     <p class="text-muted mb-0">Nenhum produto disponível no momento.</p>
   </div>
-
-  <p class="product-credits" th:unless="${catalog.empty}">
-    Fotos: Wikimedia Commons —
-    <th:block th:each="entry, catStat : ${catalog.productsByCategory}"><th:block th:each="p, st : ${entry.value}" th:if="${p.imageCredit}"><span th:text="${p.name} + ' (' + ${p.imageCredit} + ')'">x</span><th:block th:unless="${catStat.last and st.last}">; </th:block></th:block></th:block>.
-  </p>
 </main>
 
 <div th:replace="~{fragments/footer :: footer}"></div>
