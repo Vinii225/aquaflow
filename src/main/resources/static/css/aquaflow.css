@@ -224,6 +224,11 @@ body > main {
   background-color: var(--color-background);
 }
 
+.split-auth-panel {
+  max-width: 380px;
+  width: 100%;
+}
+
 .split-auth-brand {
   font-weight: 700;
   font-size: 1.25rem;
@@ -232,9 +237,33 @@ body > main {
 }
 
 @media (max-width: 767.98px) {
+  /* No celular a foto vira uma faixa curta e o formulário aparece sem rolar */
+  .split-auth {
+    min-height: 100svh;
+    align-content: flex-start;
+  }
+
   .split-auth-media {
-    min-height: 200px;
+    min-height: 0;
+    height: 180px;
+    padding: 1.5rem !important;
     background-attachment: scroll;
+    background-position: center;
+  }
+
+  .split-auth-media-content .h2 {
+    font-size: 1.375rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .split-auth-media-content p:last-child {
+    font-size: 0.9375rem;
+  }
+
+  .split-auth-form {
+    align-items: flex-start !important;
+    padding-top: 2rem !important;
+    padding-bottom: 3rem !important;
   }
 }
 

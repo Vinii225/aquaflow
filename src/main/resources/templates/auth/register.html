@@ -12,7 +12,7 @@
   </div>
 
   <div class="col-md-6 split-auth-form d-flex align-items-center justify-content-center p-4">
-    <div style="max-width: 380px; width: 100%;">
+    <div class="split-auth-panel">
       <a th:href="@{/}" class="split-auth-brand d-inline-flex align-items-center gap-2 mb-4">
         <i class="bi bi-water"></i> AquaFlow
       </a>
@@ -22,25 +22,25 @@
       <form th:action="@{/register}" th:object="${registerForm}" method="post">
         <div class="mb-3">
           <label class="form-label" for="name">Nome</label>
-          <input type="text" class="form-control" id="name" th:field="*{name}"
+          <input type="text" class="form-control" id="name" th:field="*{name}" autocomplete="name"
                  th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'">
           <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
         </div>
         <div class="mb-3">
           <label class="form-label" for="email">E-mail</label>
-          <input type="email" class="form-control" id="email" th:field="*{email}"
+          <input type="email" class="form-control" id="email" th:field="*{email}" autocomplete="email"
                  th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'">
           <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
         </div>
         <div class="mb-3">
           <label class="form-label" for="password">Senha</label>
-          <input type="password" class="form-control" id="password" th:field="*{password}"
+          <input type="password" class="form-control" id="password" th:field="*{password}" autocomplete="new-password"
                  th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'">
           <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
         </div>
         <div class="mb-3">
           <label class="form-label" for="confirmPassword">Confirmar senha</label>
-          <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}"
+          <input type="password" class="form-control" id="confirmPassword" th:field="*{confirmPassword}" autocomplete="new-password"
                  th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid'">
           <div class="invalid-feedback" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></div>
         </div>
