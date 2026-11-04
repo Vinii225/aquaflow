@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<!-- Linha de aula com barra de ocupação, usada nos painéis do admin e do professor -->
+<li th:fragment="sessionRow(l, showTeacher)" class="dash-session">
+  <div class="dash-session-when">
+    <span class="dash-session-day" th:text="${@formats.day(l.session.date)}">ter 04/11</span>
+    <span class="dash-session-time" th:text="${#temporals.format(l.session.startTime, 'HH:mm')}">07:00</span>
+  </div>
+  <div class="dash-session-info">
+    <p class="dash-session-name mb-0" th:text="${l.session.swimClass.name}">Natação Adulto</p>
+    <p class="dash-session-meta mb-1" th:if="${showTeacher}" th:text="'Prof. ' + ${l.session.teacher.name}">Prof. Ricardo</p>
+    <div class="dash-meter" role="meter" aria-valuemin="0" th:attr="aria-valuemax=${l.capacity},aria-valuenow=${l.booked},aria-label='Ocupação ' + ${l.booked} + ' de ' + ${l.capacity}">
+      <span th:style="'width:' + ${l.percent} + '%'" th:classappend="${l.full} ? 'is-full'"></span>
+    </div>
+  </div>
+  <div class="dash-session-count">
+    <span th:text="${l.booked} + '/' + ${l.capacity}">6/10</span>
+    <span class="dash-full" th:if="${l.full}">Lotada</span>
+  </div>
+  <a sec:authorize="hasRole('TEACHER')" th:unless="${showTeacher}" class="btn btn-sm btn-outline-primary"
+     th:href="@{/teacher/sessions/{id}/attendance(id=${l.session.id})}">Chamada</a>
+</li>
+</body>
+</html>

@@ -15,4 +15,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     List<Subscription> findByTenantIdAndStatus(UUID tenantId, SubscriptionStatus status);
     List<Subscription> findByStudentId(UUID studentId);
     Optional<Subscription> findFirstByStudentIdAndStatusOrderByStartDateDesc(UUID studentId, SubscriptionStatus status);
+
+    long countByTenantIdAndStatus(UUID tenantId, SubscriptionStatus status);
 }
