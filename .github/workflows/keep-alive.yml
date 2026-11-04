@@ -1,0 +1,27 @@
+name: Manter homologação acordada
+
+# O plano gratuito do Render desliga o serviço depois de 15 min sem acesso, e a
+# primeira visita seguinte leva mais de 1 minuto para subir. Um acesso a cada
+# 10 min no horário de uso evita isso. O serviço ainda dorme de madrugada, o que
+# mantém o uso dentro das 750 h/mês do plano.
+on:
+  schedule:
+    # 07h às 23h no horário de Brasília (10h às 02h UTC)
+    - cron: '*/10 10-23,0-1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  HOMOLOG_URL: ${{ vars.HOMOLOG_URL || 'https://aquaflow-9h8a.onrender.com' }}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Acessar a página inicial
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code} %{time_total}s' -m 150 "$HOMOLOG_URL/" || true)
+          echo "Resposta: $code"
