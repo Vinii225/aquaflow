@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Contratar ' + ${plan.name}, null)}"></head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container pb-5">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <nav aria-label="Etapas" class="mb-3">
+    <a class="home-link" th:href="@{/planos}"><i class="bi bi-arrow-left-short" aria-hidden="true"></i> Voltar aos planos</a>
+  </nav>
+
+  <h1 class="checkout-title mb-1">Contratar o plano <span th:text="${plan.name}">Regular</span></h1>
+  <p class="text-muted mb-4">Confira o resumo, escolha o vencimento e a forma de pagamento.</p>
+
+  <div class="row g-4 align-items-start">
+    <div class="col-lg-7 order-2 order-lg-1">
+      <form class="card-aquaflow checkout-form p-4" th:action="@{/planos/{id}/contratar(id=${plan.id})}"
+            th:object="${enrollmentForm}" method="post" novalidate>
+
+        <fieldset class="mb-4">
+          <legend class="checkout-legend">Dia de vencimento</legend>
+          <p class="small text-muted mb-2">A partir do mês que vem, a mensalidade vence neste dia.</p>
+          <div class="checkout-days" th:classappend="${#fields.hasErrors('dueDay')} ? 'is-invalid'">
+            <th:block th:each="d : ${dueDays}">
+              <input type="radio" class="btn-check" th:field="*{dueDay}" th:value="${d}" th:id="'dueDay' + ${d}">
+              <label class="btn checkout-day" th:for="'dueDay' + ${d}" th:text="'Dia ' + ${d}">Dia 10</label>
+            </th:block>
+          </div>
+          <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('dueDay')}" th:errors="*{dueDay}"></div>
+        </fieldset>
+
+        <fieldset class="mb-4">
+          <legend class="checkout-legend">Forma de pagamento</legend>
+          <div class="checkout-methods">
+            <th:block th:each="m : ${paymentMethods}">
+              <input type="radio" class="btn-check" th:field="*{paymentMethod}" th:value="${m}" th:id="'pm' + ${m}">
+              <label class="checkout-method" th:for="'pm' + ${m}">
+                <i class="bi" aria-hidden="true"
+                   th:classappend="${m.name() == 'PIX'} ? 'bi-qr-code' : (${m.name() == 'CREDIT_CARD'} ? 'bi-credit-card' : 'bi-upc-scan')"></i>
+                <span>
+                  <span class="checkout-method-name" th:text="${m.label}">Pix</span>
+                  <span class="checkout-method-hint" th:text="${m.hint}">Aprovação na hora</span>
+                </span>
+              </label>
+            </th:block>
+          </div>
+          <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}"></div>
+        </fieldset>
+
+        <div class="alert alert-info small d-flex gap-2 mb-4" role="note">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          <span>Ambiente de homologação: o pagamento é <strong>simulado</strong> e nenhuma cobrança real é feita.</span>
+        </div>
+
+        <div class="form-check mb-4">
+          <input class="form-check-input" type="checkbox" th:field="*{acceptTerms}" th:errorclass="is-invalid" id="acceptTerms">
+          <label class="form-check-label" for="acceptTerms">
+            Li e concordo: a mensalidade é recorrente e o plano pode ser cancelado na recepção da escola.
+          </label>
+          <div class="invalid-feedback" th:errors="*{acceptTerms}"></div>
+        </div>
+
+        <button type="submit" class="btn btn-accent btn-lg w-100">
+          Pagar <span th:text="'R$ ' + ${#numbers.formatDecimal(plan.monthlyFee, 1, 'POINT', 2, 'COMMA')}">R$ 150,00</span> e contratar
+        </button>
+      </form>
+    </div>
+
+    <aside class="col-lg-5 order-1 order-lg-2">
+      <div class="card-aquaflow checkout-summary p-4">
+        <p class="checkout-summary-label mb-1">Resumo</p>
+        <h2 class="h4 mb-1" th:text="${plan.name}">Regular</h2>
+        <p class="plan-frequency mb-3">
+          <i class="bi bi-calendar-week" aria-hidden="true"></i>
+          <span th:text="${plan.classesPerWeek} + (${plan.classesPerWeek} == 1 ? ' aula por semana' : ' aulas por semana')">2 aulas por semana</span>
+        </p>
+        <ul class="list-unstyled plan-features mb-3">
+          <li th:each="f : ${plan.features}" class="d-flex align-items-start gap-2">
+            <i class="bi bi-check-circle-fill" aria-hidden="true"></i> <span th:text="${f}">Benefício</span>
+          </li>
+        </ul>
+        <dl class="checkout-total mb-0">
+          <div>
+            <dt>Mensalidade</dt>
+            <dd th:text="'R$ ' + ${#numbers.formatDecimal(plan.monthlyFee, 1, 'POINT', 2, 'COMMA')}">R$ 150,00</dd>
+          </div>
+          <div class="checkout-total-today">
+            <dt>Total hoje</dt>
+            <dd th:text="'R$ ' + ${#numbers.formatDecimal(plan.monthlyFee, 1, 'POINT', 2, 'COMMA')}">R$ 150,00</dd>
+          </div>
+        </dl>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

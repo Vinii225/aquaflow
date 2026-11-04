@@ -38,16 +38,26 @@
           </li>
         </ul>
 
-        <a sec:authorize="!isAuthenticated()" th:href="@{/register}"
-           class="btn btn-lg w-100" th:classappend="${p.highlighted} ? 'btn-accent' : 'btn-outline-primary'">
-          Quero este plano
-        </a>
-        <button type="button" sec:authorize="!isAuthenticated()" class="btn btn-link plan-seller-link w-100 mt-2"
-                data-bs-toggle="modal" data-bs-target="#contactModal"
-                th:attr="data-plan-id=${p.id},data-plan-name=${p.name}">
-          <i class="bi bi-chat-dots me-1"></i> Falar com o vendedor
-        </button>
-        <button type="button" sec:authorize="isAuthenticated()"
+        <th:block th:with="isCurrent=${currentPlanName != null and currentPlanName == p.name}">
+          <!-- Visitante e aluno sem plano: contratação pelo site. O visitante passa pelo login antes. -->
+          <a th:if="${currentPlanName == null}" sec:authorize="!isAuthenticated() or hasRole('STUDENT')"
+             th:href="@{/planos/{id}/contratar(id=${p.id})}"
+             class="btn btn-lg w-100" th:classappend="${p.highlighted} ? 'btn-accent' : 'btn-outline-primary'">
+            Quero este plano
+          </a>
+          <span th:if="${isCurrent}" class="btn btn-lg w-100 plan-current disabled" aria-disabled="true">
+            <i class="bi bi-check2-circle me-1" aria-hidden="true"></i> Seu plano atual
+          </span>
+          <button type="button" th:unless="${isCurrent}"
+                  th:class="${currentPlanName != null} ? 'btn btn-lg btn-outline-primary w-100' : 'btn btn-link plan-seller-link w-100 mt-2'"
+                  sec:authorize="!isAuthenticated() or hasRole('STUDENT')"
+                  data-bs-toggle="modal" data-bs-target="#contactModal"
+                  th:attr="data-plan-id=${p.id},data-plan-name=${p.name}">
+            <i class="bi bi-chat-dots me-1" aria-hidden="true"></i>
+            <span th:text="${currentPlanName != null} ? 'Trocar para este plano' : 'Falar com o vendedor'">Falar com o vendedor</span>
+          </button>
+        </th:block>
+        <button type="button" sec:authorize="isAuthenticated() and !hasRole('STUDENT')"
                 class="btn btn-lg w-100" th:classappend="${p.highlighted} ? 'btn-accent' : 'btn-outline-primary'"
                 data-bs-toggle="modal" data-bs-target="#contactModal"
                 th:attr="data-plan-id=${p.id},data-plan-name=${p.name}">
@@ -63,7 +73,7 @@
   </div>
 
   <p class="text-center text-muted small mt-4 mb-0">
-    Valores mensais por aluno. Ficou com dúvida?
+    Valores mensais por aluno. A primeira mensalidade é paga na contratação. Ficou com dúvida?
     <button type="button" class="btn btn-link btn-sm p-0 align-baseline" data-bs-toggle="modal" data-bs-target="#contactModal">
       Fale com um vendedor</button>.
   </p>

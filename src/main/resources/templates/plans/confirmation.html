@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Plano contratado', null)}"></head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container pb-5">
+  <section class="card-aquaflow confirmation-card mx-auto p-4 p-md-5 text-center" th:object="${confirmation}">
+    <span class="confirmation-icon" aria-hidden="true"><i class="bi bi-check-lg"></i></span>
+    <h1 class="checkout-title mt-3 mb-2">Bem-vindo ao plano <span th:text="*{planName}">Regular</span>!</h1>
+    <p class="text-muted mb-4">A contratação foi registrada e a primeira mensalidade já consta como paga.</p>
+
+    <dl class="confirmation-details text-start mb-4">
+      <div>
+        <dt>Plano</dt>
+        <dd th:text="*{planName}">Regular</dd>
+      </div>
+      <div>
+        <dt>Mensalidade</dt>
+        <dd th:text="'R$ ' + ${#numbers.formatDecimal(confirmation.monthlyFee, 1, 'POINT', 2, 'COMMA')}">R$ 150,00</dd>
+      </div>
+      <div>
+        <dt>Início</dt>
+        <dd th:text="${#temporals.format(confirmation.startDate, 'dd/MM/yyyy')}">04/11/2026</dd>
+      </div>
+      <div>
+        <dt>Primeira mensalidade</dt>
+        <dd th:text="*{firstInvoiceStatus} ?: '—'">Paga</dd>
+      </div>
+      <div>
+        <dt>Próximo vencimento</dt>
+        <dd th:text="${#temporals.format(confirmation.nextDueDate, 'dd/MM/yyyy')}">10/12/2026</dd>
+      </div>
+    </dl>
+
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+      <a class="btn btn-accent" th:href="@{/student/sessions}">Reservar minha primeira aula</a>
+      <a class="btn btn-outline-primary" th:href="@{/student/invoices}">Ver minhas faturas</a>
+    </div>
+  </section>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

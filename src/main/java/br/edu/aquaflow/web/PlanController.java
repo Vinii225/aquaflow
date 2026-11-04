@@ -4,6 +4,7 @@ import br.edu.aquaflow.repository.PlanRepository;
 import br.edu.aquaflow.repository.UserRepository;
 import br.edu.aquaflow.security.AquaflowUserDetails;
 import br.edu.aquaflow.service.ContactMessageService;
+import br.edu.aquaflow.service.PlanEnrollmentService;
 import br.edu.aquaflow.service.TenantContext;
 import br.edu.aquaflow.web.dto.ContactForm;
 import jakarta.validation.Valid;
@@ -23,15 +24,18 @@ public class PlanController {
     private final PlanRepository planRepository;
     private final UserRepository userRepository;
     private final ContactMessageService contactMessageService;
+    private final PlanEnrollmentService enrollmentService;
 
     public PlanController(TenantContext tenantContext,
                            PlanRepository planRepository,
                            UserRepository userRepository,
-                           ContactMessageService contactMessageService) {
+                           ContactMessageService contactMessageService,
+                           PlanEnrollmentService enrollmentService) {
         this.tenantContext = tenantContext;
         this.planRepository = planRepository;
         this.userRepository = userRepository;
         this.contactMessageService = contactMessageService;
+        this.enrollmentService = enrollmentService;
     }
 
     @GetMapping("/planos")
@@ -45,7 +49,7 @@ public class PlanController {
             });
         }
         model.addAttribute("contactForm", form);
-        return page(model);
+        return page(currentUser, model);
     }
 
     @PostMapping("/planos/contato")
@@ -56,7 +60,7 @@ public class PlanController {
                            Model model) {
         if (bindingResult.hasErrors()) {
             model.addAttribute("openContactModal", true);
-            return page(model);
+            return page(currentUser, model);
         }
 
         if (form.getWebsite() == null || form.getWebsite().isBlank()) {
@@ -68,7 +72,11 @@ public class PlanController {
         return "redirect:/planos";
     }
 
-    private String page(Model model) {
+    private String page(AquaflowUserDetails currentUser, Model model) {
+        if (currentUser != null) {
+            model.addAttribute("currentPlanName",
+                    enrollmentService.currentPlanName(currentUser.getUserId()).orElse(null));
+        }
         model.addAttribute("plans",
                 planRepository.findByTenantIdAndActiveTrueOrderByDisplayOrderAsc(tenantContext.getTenantId()));
         return "plans";
