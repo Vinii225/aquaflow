@@ -27,12 +27,14 @@ public class AuthController {
     @GetMapping("/login")
     public String login(HttpServletRequest request, HttpServletResponse response, Model model) {
         model.addAttribute("enrollmentPending", isEnrollmentPending(request, response));
+        model.addAttribute("storeCheckoutPending", isPending(request, response, "/loja/checkout"));
         return "auth/login";
     }
 
     @GetMapping("/register")
     public String registerForm(HttpServletRequest request, HttpServletResponse response, Model model) {
         model.addAttribute("enrollmentPending", isEnrollmentPending(request, response));
+        model.addAttribute("storeCheckoutPending", isPending(request, response, "/loja/checkout"));
         if (!model.containsAttribute("registerForm")) {
             model.addAttribute("registerForm", new RegisterForm());
         }
@@ -66,7 +68,11 @@ public class AuthController {
 
     /** O visitante clicou em "Quero este plano" e foi mandado para o login. */
     private boolean isEnrollmentPending(HttpServletRequest request, HttpServletResponse response) {
+        return isPending(request, response, "/contratar");
+    }
+
+    private boolean isPending(HttpServletRequest request, HttpServletResponse response, String path) {
         var saved = requestCache.getRequest(request, response);
-        return saved != null && saved.getRedirectUrl().contains("/contratar");
+        return saved != null && saved.getRedirectUrl().contains(path);
     }
 }
