@@ -25,7 +25,7 @@
           <td th:text="${#temporals.format(i.referenceMonth, 'MM/yyyy')}"></td>
           <td th:text="'R$ ' + ${#numbers.formatDecimal(i.amount, 1, 2)}"></td>
           <td th:text="${#temporals.format(i.dueDate, 'dd/MM/yyyy')}"></td>
-          <td><span class="badge" th:classappend="'badge-status-' + ${#strings.toLowerCase(i.status)}" th:text="${i.status}"></span></td>
+          <td><span class="badge" th:classappend="'badge-status-' + ${#strings.toLowerCase(i.status)}" th:text="${i.status.label}"></span></td>
           <td class="text-end">
             <form th:if="${i.status.name() == 'OPEN'}" th:action="@{/admin/invoices/{id}/pay(id=${i.id})}"
                   method="post" class="d-flex gap-1 justify-content-end">

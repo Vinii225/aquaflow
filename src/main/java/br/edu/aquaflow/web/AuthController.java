@@ -2,7 +2,10 @@ package br.edu.aquaflow.web;
 
 import br.edu.aquaflow.service.AuthService;
 import br.edu.aquaflow.web.dto.RegisterForm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,18 +18,21 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class AuthController {
 
     private final AuthService authService;
+    private final HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
 
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
     @GetMapping("/login")
-    public String login() {
+    public String login(HttpServletRequest request, HttpServletResponse response, Model model) {
+        model.addAttribute("enrollmentPending", isEnrollmentPending(request, response));
         return "auth/login";
     }
 
     @GetMapping("/register")
-    public String registerForm(Model model) {
+    public String registerForm(HttpServletRequest request, HttpServletResponse response, Model model) {
+        model.addAttribute("enrollmentPending", isEnrollmentPending(request, response));
         if (!model.containsAttribute("registerForm")) {
             model.addAttribute("registerForm", new RegisterForm());
         }
@@ -56,5 +62,11 @@ public class AuthController {
         redirectAttributes.addFlashAttribute("successMessage",
                 "Conta criada com sucesso! Faça login para continuar.");
         return "redirect:/login";
+    }
+
+    /** O visitante clicou em "Quero este plano" e foi mandado para o login. */
+    private boolean isEnrollmentPending(HttpServletRequest request, HttpServletResponse response) {
+        var saved = requestCache.getRequest(request, response);
+        return saved != null && saved.getRedirectUrl().contains("/contratar");
     }
 }

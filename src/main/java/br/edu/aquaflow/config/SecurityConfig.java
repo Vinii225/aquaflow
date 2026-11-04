@@ -20,6 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/planos/*/contratar", "/planos/contratacao/**").hasRole("STUDENT")
                 .requestMatchers("/", "/planos", "/planos/contato", "/loja", "/login", "/register", "/css/**", "/img/**", "/webjars/**", "/error").permitAll()
                 .requestMatchers("/plataforma/**").hasRole("PLATFORM_ADMIN")
                 .requestMatchers("/admin/**").hasRole("SCHOOL_ADMIN")
@@ -29,7 +30,8 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/", true)
+                // Volta para a página que pediu o login (ex.: contratação de plano); sem ela, vai para o início
+                .defaultSuccessUrl("/", false)
                 .failureUrl("/login?error")
                 .permitAll()
             )
