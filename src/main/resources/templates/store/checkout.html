@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Finalizar compra', null)}"></head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container pb-5">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <nav class="mb-3">
+    <a class="home-link" th:href="@{/loja/carrinho}"><i class="bi bi-arrow-left-short" aria-hidden="true"></i> Voltar ao carrinho</a>
+  </nav>
+  <h1 class="checkout-title mb-1">Finalizar compra</h1>
+  <p class="text-muted mb-4">Escolha a forma de pagamento. Os produtos ficam separados na recepção.</p>
+
+  <div class="row g-4 align-items-start">
+    <div class="col-lg-7 order-2 order-lg-1">
+      <form class="card-aquaflow checkout-form p-4" th:action="@{/loja/checkout}" th:object="${checkoutForm}" method="post" novalidate>
+        <fieldset class="mb-4">
+          <legend class="checkout-legend">Forma de pagamento</legend>
+          <div class="checkout-methods">
+            <th:block th:each="m : ${paymentMethods}">
+              <input type="radio" class="btn-check" th:field="*{paymentMethod}" th:value="${m}" th:id="'pm' + ${m}">
+              <label class="checkout-method" th:for="'pm' + ${m}">
+                <i class="bi" aria-hidden="true"
+                   th:classappend="${m.name() == 'PIX'} ? 'bi-qr-code' : (${m.name() == 'CREDIT_CARD'} ? 'bi-credit-card' : 'bi-upc-scan')"></i>
+                <span>
+                  <span class="checkout-method-name" th:text="${m.label}">Pix</span>
+                  <span class="checkout-method-hint" th:text="${m.name() == 'CREDIT_CARD'} ? 'À vista no cartão' : ${m.hint}">Aprovação na hora</span>
+                </span>
+              </label>
+            </th:block>
+          </div>
+          <div class="invalid-feedback d-block" th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}"></div>
+        </fieldset>
+
+        <div class="checkout-pickup mb-4">
+          <i class="bi bi-shop" aria-hidden="true"></i>
+          <div>
+            <p class="fw-bold mb-0">Retirada na recepção</p>
+            <p class="small text-muted mb-0" th:text="${schoolAddress}">Endereço</p>
+          </div>
+        </div>
+
+        <div class="alert alert-info small d-flex gap-2 mb-4" role="note">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          <span>Ambiente de homologação: o pagamento é <strong>simulado</strong> e nenhuma cobrança real é feita.</span>
+        </div>
+
+        <button type="submit" class="btn btn-accent btn-lg w-100">
+          Pagar <span th:text="'R$ ' + ${#numbers.formatDecimal(cart.total, 1, 'POINT', 2, 'COMMA')}">R$ 99,80</span>
+        </button>
+      </form>
+    </div>
+
+    <aside class="col-lg-5 order-1 order-lg-2">
+      <div class="card-aquaflow checkout-summary p-4">
+        <p class="checkout-summary-label mb-2">Seu pedido</p>
+        <ul class="list-unstyled checkout-items mb-3">
+          <li th:each="l : ${cart.lines}">
+            <span><span th:text="${l.quantity} + '×'">1×</span> <span th:text="${l.product.name}">Óculos</span></span>
+            <span th:text="'R$ ' + ${#numbers.formatDecimal(l.lineTotal, 1, 'POINT', 2, 'COMMA')}">R$ 49,90</span>
+          </li>
+        </ul>
+
+        <dl class="checkout-total mb-0" th:fragment="totals">
+          <div>
+            <dt th:text="'Subtotal (' + ${cart.itemCount} + (${cart.itemCount} == 1 ? ' item)' : ' itens)')">Subtotal</dt>
+            <dd th:text="'R$ ' + ${#numbers.formatDecimal(cart.subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 99,80</dd>
+          </div>
+          <div class="checkout-discount" th:if="${cart.discountPercent > 0}">
+            <dt th:text="'Desconto plano ' + ${cart.discountPlanName} + ' (' + ${cart.discountPercent} + '%)'">Desconto</dt>
+            <dd th:text="'− R$ ' + ${#numbers.formatDecimal(cart.discount, 1, 'POINT', 2, 'COMMA')}">− R$ 9,98</dd>
+          </div>
+          <div class="checkout-total-today">
+            <dt>Total</dt>
+            <dd th:text="'R$ ' + ${#numbers.formatDecimal(cart.total, 1, 'POINT', 2, 'COMMA')}">R$ 89,82</dd>
+          </div>
+        </dl>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

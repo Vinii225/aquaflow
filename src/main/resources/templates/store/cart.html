@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Carrinho', null)}"></head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container pb-5">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <nav class="mb-3">
+    <a class="home-link" th:href="@{/loja}"><i class="bi bi-arrow-left-short" aria-hidden="true"></i> Continuar comprando</a>
+  </nav>
+  <h1 class="checkout-title mb-4">Carrinho</h1>
+
+  <div class="card-aquaflow cart-empty p-5 text-center" th:if="${cart.empty}">
+    <i class="bi bi-bag fs-1 text-muted" aria-hidden="true"></i>
+    <p class="mt-2 mb-3">Seu carrinho está vazio.</p>
+    <a class="btn btn-accent" th:href="@{/loja}">Ver produtos</a>
+  </div>
+
+  <div class="row g-4 align-items-start" th:unless="${cart.empty}">
+    <div class="col-lg-8">
+      <ul class="card-aquaflow cart-list list-unstyled mb-0">
+        <li class="cart-line" th:each="l : ${cart.lines}">
+          <img class="cart-thumb" th:if="${l.product.imagePath}" th:src="@{${l.product.imagePath}}" alt="" width="96" height="72">
+          <div class="cart-line-info">
+            <p class="cart-line-name mb-0" th:text="${l.product.name}">Óculos de natação</p>
+            <p class="cart-line-unit mb-0" th:text="'R$ ' + ${#numbers.formatDecimal(l.product.price, 1, 'POINT', 2, 'COMMA')} + ' cada'">R$ 49,90 cada</p>
+          </div>
+          <div class="cart-qty" role="group" th:attr="aria-label='Quantidade de ' + ${l.product.name}">
+            <form th:action="@{/loja/carrinho/{id}/quantidade(id=${l.product.id})}" method="post">
+              <input type="hidden" name="quantity" th:value="${l.quantity - 1}">
+              <button type="submit" class="btn cart-qty-btn" th:attr="aria-label='Diminuir ' + ${l.product.name}"><i class="bi bi-dash" aria-hidden="true"></i></button>
+            </form>
+            <span class="cart-qty-value" th:text="${l.quantity}" aria-live="polite">1</span>
+            <form th:action="@{/loja/carrinho/{id}/quantidade(id=${l.product.id})}" method="post">
+              <input type="hidden" name="quantity" th:value="${l.quantity + 1}">
+              <button type="submit" class="btn cart-qty-btn" th:disabled="${l.quantity >= T(br.edu.aquaflow.service.store.ShoppingCart).MAX_QUANTITY}"
+                      th:attr="aria-label='Aumentar ' + ${l.product.name}"><i class="bi bi-plus" aria-hidden="true"></i></button>
+            </form>
+          </div>
+          <p class="cart-line-total mb-0" th:text="'R$ ' + ${#numbers.formatDecimal(l.lineTotal, 1, 'POINT', 2, 'COMMA')}">R$ 49,90</p>
+          <form th:action="@{/loja/carrinho/{id}/remover(id=${l.product.id})}" method="post">
+            <button type="submit" class="btn cart-remove" th:attr="aria-label='Remover ' + ${l.product.name}">
+              <i class="bi bi-trash3" aria-hidden="true"></i>
+            </button>
+          </form>
+        </li>
+      </ul>
+    </div>
+
+    <aside class="col-lg-4">
+      <div class="card-aquaflow checkout-summary p-4">
+        <p class="checkout-summary-label mb-2">Resumo</p>
+        <div th:replace="~{store/checkout :: totals}"></div>
+
+        <p class="small text-muted mt-3 mb-3" sec:authorize="!isAuthenticated()">
+          <i class="bi bi-tag" aria-hidden="true"></i> Alunos com plano Regular ou Intensivo têm desconto. Ele aparece quando você entra.
+        </p>
+        <p class="small text-muted mt-3 mb-3" sec:authorize="hasRole('STUDENT')" th:if="${cart.discountPercent == 0}">
+          <i class="bi bi-tag" aria-hidden="true"></i> Com um plano Regular ou Intensivo você ganha desconto na loja.
+          <a th:href="@{/planos}">Ver planos</a>
+        </p>
+
+        <a class="btn btn-accent btn-lg w-100 mt-2" th:href="@{/loja/checkout}">Finalizar compra</a>
+        <p class="small text-muted text-center mt-2 mb-0">Retirada na recepção da escola.</p>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

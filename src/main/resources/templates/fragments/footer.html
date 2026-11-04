@@ -44,6 +44,7 @@
 
           <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/sessions}">Aulas disponíveis</a></li>
           <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/bookings}">Minhas reservas</a></li>
+          <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/orders}">Meus pedidos</a></li>
           <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/invoices}">Minhas faturas</a></li>
 
           <li sec:authorize="hasRole('GUARDIAN')"><a th:href="@{/}">Início</a></li>
