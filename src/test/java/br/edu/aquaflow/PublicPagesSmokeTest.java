@@ -225,4 +225,31 @@ class PublicPagesSmokeTest {
         mvc.perform(get("/loja/carrinho").session(session))
                 .andExpect(content().string(containsString("Seu carrinho está vazio")));
     }
+
+    @Test
+    void adminEntraNoPainelComIndicadores() throws Exception {
+        MockHttpSession admin = login("admin@aquaflow.com", "admin123");
+        mvc.perform(get("/painel").session(admin)).andExpect(redirectedUrl("/admin"));
+        mvc.perform(post("/admin/sessions/generate").session(admin).with(csrf()));
+        mvc.perform(get("/admin").session(admin))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Painel da escola")))
+                .andExpect(content().string(containsString("Alunos com plano ativo")))
+                .andExpect(content().string(containsString("Prof. Ricardo Lima")));
+    }
+
+    @Test
+    void professorVeSeuPainelEAlunoNaoAcessaODoAdmin() throws Exception {
+        MockHttpSession teacher = login("ricardo@aquaflow.com", "professor123");
+        mvc.perform(get("/painel").session(teacher)).andExpect(redirectedUrl("/teacher"));
+        mvc.perform(post("/admin/sessions/generate").session(login("admin@aquaflow.com", "admin123")).with(csrf()));
+        mvc.perform(get("/teacher").session(teacher))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Ricardo")))
+                .andExpect(content().string(containsString("Natação Adulto - Iniciante")));
+
+        authService.registerStudent("Bisbilhoteiro", "bisbilhoteiro@teste.com", "senha123");
+        mvc.perform(get("/admin").session(login("bisbilhoteiro@teste.com", "senha123")))
+                .andExpect(status().isForbidden());
+    }
 }

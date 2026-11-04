@@ -1,8 +1,10 @@
 package br.edu.aquaflow.repository;
 
 import br.edu.aquaflow.domain.ClassSession;
+import br.edu.aquaflow.domain.enums.SessionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
@@ -20,4 +22,12 @@ public interface ClassSessionRepository extends JpaRepository<ClassSession, UUID
             UUID teacherId, LocalDate from, LocalDate to);
 
     Optional<ClassSession> findByClassScheduleIdAndDate(UUID classScheduleId, LocalDate date);
+
+    @EntityGraph(attributePaths = {"swimClass", "teacher"})
+    List<ClassSession> findByTenantIdAndDateBetweenAndStatusNotOrderByDateAscStartTimeAsc(
+            UUID tenantId, LocalDate from, LocalDate to, SessionStatus status);
+
+    @EntityGraph(attributePaths = "swimClass")
+    List<ClassSession> findByTeacherIdAndDateBetweenAndStatusOrderByDateAscStartTimeAsc(
+            UUID teacherId, LocalDate from, LocalDate to, SessionStatus status);
 }

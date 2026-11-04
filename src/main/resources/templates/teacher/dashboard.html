@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/head :: head('Painel', null)}"></head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container pb-5">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <header class="dash-head">
+    <div>
+      <h1 class="checkout-title mb-1">Olá, <span sec:authentication="principal.fullName">professor</span></h1>
+      <p class="text-muted mb-0">Suas aulas e chamadas em um só lugar.</p>
+    </div>
+    <a class="btn btn-outline-primary btn-sm" th:href="@{/teacher/sessions}"><i class="bi bi-calendar3 me-1" aria-hidden="true"></i>Todas as aulas</a>
+  </header>
+
+  <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2"
+       th:unless="${#lists.isEmpty(dash.pendingAttendance)}" role="status">
+    <span>
+      <i class="bi bi-exclamation-triangle-fill me-1" aria-hidden="true"></i>
+      <strong th:text="${#lists.size(dash.pendingAttendance)} + (${#lists.size(dash.pendingAttendance)} == 1 ? ' chamada pendente' : ' chamadas pendentes')">2 chamadas pendentes</strong>
+    </span>
+    <a class="btn btn-sm btn-warning" th:href="@{/teacher/sessions/{id}/attendance(id=${dash.pendingAttendance[0].session.id})}">Fazer a mais antiga</a>
+  </div>
+
+  <section class="dash-stats" aria-label="Indicadores">
+    <div class="dash-stat">
+      <p class="dash-stat-label">Aulas hoje</p>
+      <p class="dash-stat-value" th:text="${#lists.size(dash.today)}">2</p>
+    </div>
+    <div class="dash-stat">
+      <p class="dash-stat-label">Aulas nos próximos 7 dias</p>
+      <p class="dash-stat-value" th:text="${#lists.size(dash.week)}">5</p>
+    </div>
+    <div class="dash-stat">
+      <p class="dash-stat-label">Alunos reservados na semana</p>
+      <p class="dash-stat-value" th:text="${dash.studentsThisWeek}">18</p>
+    </div>
+    <div class="dash-stat">
+      <p class="dash-stat-label">Presença · últimos 30 dias</p>
+      <p class="dash-stat-value" th:text="${dash.attendanceRate != null} ? ${dash.attendanceRate} + '%' : '—'">86%</p>
+      <p class="dash-stat-sub" th:text="${dash.attendanceRecorded} + ' registros de chamada'">14 registros</p>
+    </div>
+  </section>
+
+  <div class="row g-4">
+    <section class="col-lg-6" th:unless="${#lists.isEmpty(dash.pendingAttendance)}">
+      <div class="card-aquaflow dash-card h-100">
+        <div class="dash-card-head"><h2 class="dash-card-title">Chamadas pendentes</h2></div>
+        <ul class="dash-sessions list-unstyled mb-0">
+          <th:block th:each="l : ${dash.pendingAttendance}"><li th:replace="~{fragments/dashboard :: sessionRow(${l}, false)}"></li></th:block>
+        </ul>
+      </div>
+    </section>
+
+    <section th:class="${#lists.isEmpty(dash.pendingAttendance)} ? 'col-12' : 'col-lg-6'">
+      <div class="card-aquaflow dash-card h-100">
+        <div class="dash-card-head"><h2 class="dash-card-title">Próximos 7 dias</h2></div>
+        <p class="text-muted small mb-0" th:if="${#lists.isEmpty(dash.week)}">Nenhuma aula agendada para os próximos dias.</p>
+        <ul class="dash-sessions list-unstyled mb-0" th:unless="${#lists.isEmpty(dash.week)}">
+          <th:block th:each="l : ${dash.week}"><li th:replace="~{fragments/dashboard :: sessionRow(${l}, false)}"></li></th:block>
+        </ul>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

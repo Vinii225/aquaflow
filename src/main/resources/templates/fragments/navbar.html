@@ -21,6 +21,10 @@
              th:classappend="${#strings.startsWith(currentPath, '/loja')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/loja')} ? 'page'">Loja</a></li>
 
         <li class="nav-item" sec:authorize="hasRole('SCHOOL_ADMIN')">
+          <a class="nav-link" th:href="@{/admin}"
+             th:classappend="${currentPath == '/admin'} ? 'active'" th:attr="aria-current=${currentPath == '/admin'} ? 'page'">Painel</a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('SCHOOL_ADMIN')">
           <a class="nav-link" th:href="@{/admin/pools}"
              th:classappend="${#strings.startsWith(currentPath, '/admin/pools')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/admin/pools')} ? 'page'">Piscinas</a>
         </li>
@@ -58,6 +62,10 @@
              th:classappend="${#strings.startsWith(currentPath, '/plataforma/mensagens')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/plataforma/mensagens')} ? 'page'">Mensagens</a>
         </li>
 
+        <li class="nav-item" sec:authorize="hasRole('TEACHER')">
+          <a class="nav-link" th:href="@{/teacher}"
+             th:classappend="${currentPath == '/teacher'} ? 'active'" th:attr="aria-current=${currentPath == '/teacher'} ? 'page'">Painel</a>
+        </li>
         <li class="nav-item" sec:authorize="hasRole('TEACHER')">
           <a class="nav-link" th:href="@{/teacher/sessions}"
              th:classappend="${#strings.startsWith(currentPath, '/teacher/sessions')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/teacher/sessions')} ? 'page'">Minhas aulas</a>
