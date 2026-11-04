@@ -12,7 +12,7 @@
   </div>
 
   <div class="col-md-6 split-auth-form d-flex align-items-center justify-content-center p-4">
-    <div style="max-width: 380px; width: 100%;">
+    <div class="split-auth-panel">
       <a th:href="@{/}" class="split-auth-brand d-inline-flex align-items-center gap-2 mb-4">
         <i class="bi bi-water"></i> AquaFlow
       </a>
@@ -25,11 +25,13 @@
       <form th:action="@{/login}" method="post">
         <div class="mb-3">
           <label class="form-label" for="username">E-mail</label>
-          <input type="email" class="form-control" id="username" name="username" required autofocus>
+          <input type="email" class="form-control" id="username" name="username"
+                 autocomplete="username" inputmode="email" required autofocus>
         </div>
         <div class="mb-3">
           <label class="form-label" for="password">Senha</label>
-          <input type="password" class="form-control" id="password" name="password" required>
+          <input type="password" class="form-control" id="password" name="password"
+                 autocomplete="current-password" required>
         </div>
         <button type="submit" class="btn btn-primary w-100">Entrar</button>
       </form>
