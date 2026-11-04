@@ -21,6 +21,10 @@
              th:classappend="${#strings.startsWith(currentPath, '/loja')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/loja')} ? 'page'">Loja</a></li>
 
         <li class="nav-item" sec:authorize="hasRole('SCHOOL_ADMIN')">
+          <a class="nav-link" th:href="@{/admin}"
+             th:classappend="${currentPath == '/admin'} ? 'active'" th:attr="aria-current=${currentPath == '/admin'} ? 'page'">Painel</a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('SCHOOL_ADMIN')">
           <a class="nav-link" th:href="@{/admin/pools}"
              th:classappend="${#strings.startsWith(currentPath, '/admin/pools')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/admin/pools')} ? 'page'">Piscinas</a>
         </li>
@@ -59,6 +63,10 @@
         </li>
 
         <li class="nav-item" sec:authorize="hasRole('TEACHER')">
+          <a class="nav-link" th:href="@{/teacher}"
+             th:classappend="${currentPath == '/teacher'} ? 'active'" th:attr="aria-current=${currentPath == '/teacher'} ? 'page'">Painel</a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('TEACHER')">
           <a class="nav-link" th:href="@{/teacher/sessions}"
              th:classappend="${#strings.startsWith(currentPath, '/teacher/sessions')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/teacher/sessions')} ? 'page'">Minhas aulas</a>
         </li>
@@ -72,12 +80,25 @@
              th:classappend="${#strings.startsWith(currentPath, '/student/bookings')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/student/bookings')} ? 'page'">Minhas reservas</a>
         </li>
         <li class="nav-item" sec:authorize="hasRole('STUDENT')">
+          <a class="nav-link" th:href="@{/student/orders}"
+             th:classappend="${#strings.startsWith(currentPath, '/student/orders')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/student/orders')} ? 'page'">Meus pedidos</a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('STUDENT')">
           <a class="nav-link" th:href="@{/student/invoices}"
              th:classappend="${#strings.startsWith(currentPath, '/student/invoices')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/student/invoices')} ? 'page'">Minhas faturas</a>
         </li>
       </ul>
 
       <ul class="navbar-nav align-items-lg-center">
+        <li class="nav-item me-lg-1" sec:authorize="!isAuthenticated() or hasRole('STUDENT')">
+          <a class="nav-link nav-cart d-inline-flex align-items-center gap-2" th:href="@{/loja/carrinho}"
+             th:classappend="${#strings.startsWith(currentPath, '/loja/carrinho')} ? 'active'"
+             th:attr="aria-label=${cartCount > 0} ? 'Carrinho, ' + ${cartCount} + (${cartCount} == 1 ? ' item' : ' itens') : 'Carrinho vazio'">
+            <i class="bi bi-bag fs-5" aria-hidden="true"></i>
+            <span class="d-lg-none">Carrinho</span>
+            <span class="nav-cart-count" th:if="${cartCount > 0}" th:text="${cartCount}" aria-hidden="true">2</span>
+          </a>
+        </li>
         <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
           <a class="nav-link dropdown-toggle d-inline-flex align-items-center gap-2 user-menu-toggle"
              href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

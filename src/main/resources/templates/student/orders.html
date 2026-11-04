@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Meus pedidos', null)}"></head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container">
+  <h1 class="h4 mb-3">Meus pedidos</h1>
+
+  <div class="table-responsive card-aquaflow p-3">
+    <table class="table table-aquaflow align-middle mb-0">
+      <thead>
+        <tr><th>Pedido</th><th>Data</th><th>Itens</th><th>Total</th><th>Situação</th><th></th></tr>
+      </thead>
+      <tbody>
+        <tr th:each="o : ${orders}">
+          <td class="fw-semibold" th:text="${o.code}"></td>
+          <td th:text="${#temporals.format(o.createdAt, 'dd/MM/yyyy')}"></td>
+          <td th:text="${o.itemCount}"></td>
+          <td th:text="'R$ ' + ${#numbers.formatDecimal(o.total, 1, 'POINT', 2, 'COMMA')}"></td>
+          <td><span class="badge" th:classappend="'badge-status-' + ${#strings.toLowerCase(o.status)}" th:text="${o.status.label}"></span></td>
+          <td class="text-end"><a class="btn btn-sm btn-outline-primary" th:href="@{/loja/pedidos/{id}(id=${o.id})}">Detalhes</a></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(orders)}">
+          <td colspan="6" class="text-center text-muted py-4">Nenhum pedido ainda. <a th:href="@{/loja}">Ver a loja</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

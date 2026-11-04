@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Painel', null)}"></head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container pb-5">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <header class="dash-head">
+    <div>
+      <h1 class="checkout-title mb-1">Painel da escola</h1>
+      <p class="text-muted mb-0" th:text="'Visão geral de ' + ${@formats.monthYear(#temporals.createToday())}">Visão geral</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-outline-primary btn-sm" th:href="@{/admin/invoices}"><i class="bi bi-receipt me-1" aria-hidden="true"></i>Faturas</a>
+      <a class="btn btn-outline-primary btn-sm" th:href="@{/admin/sessions}"><i class="bi bi-calendar3 me-1" aria-hidden="true"></i>Aulas</a>
+      <a class="btn btn-outline-primary btn-sm" th:href="@{/admin/transactions}"><i class="bi bi-cash-stack me-1" aria-hidden="true"></i>Caixa</a>
+    </div>
+  </header>
+
+  <section class="dash-stats" aria-label="Indicadores">
+    <div class="dash-stat">
+      <p class="dash-stat-label">Alunos com plano ativo</p>
+      <p class="dash-stat-value" th:text="${dash.activeStudents}">12</p>
+      <a class="dash-stat-link" th:href="@{/admin/subscriptions}">Ver assinaturas</a>
+    </div>
+    <div class="dash-stat">
+      <p class="dash-stat-label">Receita do mês</p>
+      <p class="dash-stat-value" th:text="${@formats.brl(dash.monthRevenue)}">R$ 1.250,00</p>
+      <p class="dash-stat-sub" th:text="'Loja: ' + ${@formats.brl(dash.monthStore)}">Loja: R$ 210,00</p>
+    </div>
+    <div class="dash-stat">
+      <p class="dash-stat-label">Faturas em aberto</p>
+      <p class="dash-stat-value" th:text="${dash.openInvoices}">4</p>
+      <p class="dash-stat-sub">
+        <span th:text="${@formats.brl(dash.openAmount)}">R$ 600,00</span>
+        <span class="dash-flag" th:if="${dash.overdueInvoices > 0}">
+          <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+          <span th:text="${dash.overdueInvoices} + (${dash.overdueInvoices} == 1 ? ' vencida' : ' vencidas')">1 vencida</span>
+        </span>
+      </p>
+    </div>
+    <div class="dash-stat">
+      <p class="dash-stat-label">Ocupação · próximos 7 dias</p>
+      <p class="dash-stat-value" th:text="${dash.weekOccupancy} + '%'">64%</p>
+      <p class="dash-stat-sub" th:text="${#lists.size(dash.upcoming)} + (${#lists.size(dash.upcoming)} == 1 ? ' aula na agenda' : ' aulas na agenda')">5 aulas</p>
+    </div>
+  </section>
+
+  <div class="row g-4">
+    <section class="col-lg-7">
+      <div class="card-aquaflow dash-card h-100">
+        <div class="dash-card-head">
+          <h2 class="dash-card-title">Receita dos últimos 6 meses</h2>
+          <ul class="dash-legend list-unstyled mb-0" aria-label="Legenda">
+            <li><span class="dash-swatch dash-swatch-tuition" aria-hidden="true"></span>Mensalidades</li>
+            <li><span class="dash-swatch dash-swatch-store" aria-hidden="true"></span>Loja</li>
+          </ul>
+        </div>
+
+        <p class="text-muted small mb-0" th:if="${dash.revenue.empty}">Nenhuma entrada no caixa nos últimos 6 meses.</p>
+
+        <div class="dash-chart" th:unless="${dash.revenue.empty}" role="img"
+             th:with="maxMonth=${@formats.brl(dash.revenue.max)}"
+             th:attr="aria-label='Receita por mês. Maior mês: ' + ${maxMonth} + '. Detalhes na tabela abaixo.'">
+          <div class="dash-bar-col" th:each="m : ${dash.revenue.months}" tabindex="0">
+            <span class="dash-bar-value" th:if="${m.total.signum() > 0}" th:text="${@formats.brlShort(m.total)}">1,2 mil</span>
+            <div class="dash-bar" th:style="'height:' + ${dash.revenue.heightOf(m.total)} + '%'">
+              <span class="dash-seg dash-seg-store" th:if="${m.store.signum() > 0}"
+                    th:style="'flex-grow:' + ${m.store}"></span>
+              <span class="dash-seg dash-seg-tuition" th:if="${m.tuition.signum() > 0}"
+                    th:style="'flex-grow:' + ${m.tuition}"></span>
+            </div>
+            <span class="dash-bar-label" th:text="${m.label}">nov</span>
+            <div class="dash-tip" role="tooltip">
+              <strong th:text="${m.label} + '/' + ${m.month.year}">nov/2026</strong>
+              <span><i class="dash-swatch dash-swatch-tuition"></i>Mensalidades <b th:text="${@formats.brl(m.tuition)}">R$ 0</b></span>
+              <span><i class="dash-swatch dash-swatch-store"></i>Loja <b th:text="${@formats.brl(m.store)}">R$ 0</b></span>
+              <span>Total <b th:text="${@formats.brl(m.total)}">R$ 0</b></span>
+            </div>
+          </div>
+        </div>
+
+        <details class="dash-table mt-3" th:unless="${dash.revenue.empty}">
+          <summary>Ver em tabela</summary>
+          <table class="table table-sm mb-0 mt-2">
+            <thead><tr><th>Mês</th><th class="text-end">Mensalidades</th><th class="text-end">Loja</th><th class="text-end">Total</th></tr></thead>
+            <tbody>
+              <tr th:each="m : ${dash.revenue.months}">
+                <td th:text="${m.label} + '/' + ${m.month.year}"></td>
+                <td class="text-end" th:text="${@formats.brl(m.tuition)}"></td>
+                <td class="text-end" th:text="${@formats.brl(m.store)}"></td>
+                <td class="text-end fw-semibold" th:text="${@formats.brl(m.total)}"></td>
+              </tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+    </section>
+
+    <section class="col-lg-5">
+      <div class="card-aquaflow dash-card h-100">
+        <div class="dash-card-head">
+          <h2 class="dash-card-title">Aulas da semana</h2>
+          <a class="dash-stat-link" th:href="@{/admin/sessions}">Ver todas</a>
+        </div>
+        <p class="text-muted small mb-0" th:if="${#lists.isEmpty(dash.upcoming)}">
+          Nenhuma aula gerada para os próximos 7 dias. Em <a th:href="@{/admin/sessions}">Aulas</a>, use "Gerar próximas semanas".
+        </p>
+        <ul class="dash-sessions list-unstyled mb-0" th:unless="${#lists.isEmpty(dash.upcoming)}">
+          <th:block th:each="l : ${dash.upcoming}"><li th:replace="~{fragments/dashboard :: sessionRow(${l}, true)}"></li></th:block>
+        </ul>
+      </div>
+    </section>
+
+    <section class="col-12">
+      <div class="card-aquaflow dash-card">
+        <div class="dash-card-head">
+          <h2 class="dash-card-title">Últimos pedidos da loja</h2>
+        </div>
+        <p class="text-muted small mb-0" th:if="${#lists.isEmpty(dash.recentOrders)}">Nenhum pedido ainda.</p>
+        <div class="table-responsive" th:unless="${#lists.isEmpty(dash.recentOrders)}">
+          <table class="table table-aquaflow align-middle mb-0">
+            <thead><tr><th>Pedido</th><th>Aluno</th><th>Data</th><th>Itens</th><th class="text-end">Total</th><th>Situação</th></tr></thead>
+            <tbody>
+              <tr th:each="o : ${dash.recentOrders}">
+                <td class="fw-semibold" th:text="${o.code}"></td>
+                <td th:text="${o.student.name}"></td>
+                <td th:text="${#temporals.format(o.createdAt, 'dd/MM HH:mm')}"></td>
+                <td th:text="${o.itemCount}"></td>
+                <td class="text-end" th:text="${@formats.brl(o.total)}"></td>
+                <td><span class="badge" th:classappend="'badge-status-' + ${#strings.toLowerCase(o.status)}" th:text="${o.status.label}"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

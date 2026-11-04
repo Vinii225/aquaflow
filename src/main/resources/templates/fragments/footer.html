@@ -35,15 +35,18 @@
 
           <li sec:authorize="hasRole('PLATFORM_ADMIN')"><a th:href="@{/plataforma/mensagens}">Mensagens</a></li>
 
+          <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin}">Painel</a></li>
           <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/sessions}">Aulas</a></li>
           <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/invoices}">Faturas</a></li>
           <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/users}">Usuários</a></li>
           <li sec:authorize="hasRole('SCHOOL_ADMIN')"><a th:href="@{/admin/transactions}">Caixa</a></li>
 
+          <li sec:authorize="hasRole('TEACHER')"><a th:href="@{/teacher}">Painel</a></li>
           <li sec:authorize="hasRole('TEACHER')"><a th:href="@{/teacher/sessions}">Minhas aulas</a></li>
 
           <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/sessions}">Aulas disponíveis</a></li>
           <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/bookings}">Minhas reservas</a></li>
+          <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/orders}">Meus pedidos</a></li>
           <li sec:authorize="hasRole('STUDENT')"><a th:href="@{/student/invoices}">Minhas faturas</a></li>
 
           <li sec:authorize="hasRole('GUARDIAN')"><a th:href="@{/}">Início</a></li>

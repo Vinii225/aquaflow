@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Pedido ' + ${order.code}, null)}"></head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main class="container pb-5">
+  <section class="card-aquaflow confirmation-card mx-auto p-4 p-md-5" th:object="${order}">
+    <div class="text-center">
+      <span class="confirmation-icon" aria-hidden="true"><i class="bi bi-bag-check"></i></span>
+      <h1 class="checkout-title mt-3 mb-2">Pedido confirmado</h1>
+      <p class="text-muted mb-1">Mostre o código abaixo na recepção para retirar seus produtos.</p>
+      <p class="order-code mb-4" th:text="*{code}">0F85B0DC</p>
+    </div>
+
+    <ul class="list-unstyled checkout-items mb-3">
+      <li th:each="i : *{items}">
+        <span><span th:text="${i.quantity} + '×'">1×</span> <span th:text="${i.productName}">Óculos</span></span>
+        <span th:text="'R$ ' + ${#numbers.formatDecimal(i.lineTotal, 1, 'POINT', 2, 'COMMA')}">R$ 49,90</span>
+      </li>
+    </ul>
+
+    <dl class="confirmation-details mb-4">
+      <div>
+        <dt>Subtotal</dt>
+        <dd th:text="'R$ ' + ${#numbers.formatDecimal(order.subtotal, 1, 'POINT', 2, 'COMMA')}">R$ 99,80</dd>
+      </div>
+      <div class="checkout-discount" th:if="*{discountPercent > 0}">
+        <dt th:text="'Desconto (' + *{discountPercent} + '%)'">Desconto</dt>
+        <dd th:text="'− R$ ' + ${#numbers.formatDecimal(order.discountAmount, 1, 'POINT', 2, 'COMMA')}">− R$ 9,98</dd>
+      </div>
+      <div>
+        <dt>Total pago</dt>
+        <dd th:text="'R$ ' + ${#numbers.formatDecimal(order.total, 1, 'POINT', 2, 'COMMA')}">R$ 89,82</dd>
+      </div>
+      <div>
+        <dt>Situação</dt>
+        <dd th:text="*{status.label}">Pago</dd>
+      </div>
+    </dl>
+
+    <div class="d-flex flex-wrap justify-content-center gap-2">
+      <a class="btn btn-outline-primary" th:href="@{/student/orders}">Meus pedidos</a>
+      <a class="btn btn-accent" th:href="@{/loja}">Voltar à loja</a>
+    </div>
+  </section>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -2,6 +2,7 @@ package br.edu.aquaflow.service;
 
 import br.edu.aquaflow.domain.Invoice;
 import br.edu.aquaflow.domain.Subscription;
+import br.edu.aquaflow.domain.Tenant;
 import br.edu.aquaflow.domain.Transaction;
 import br.edu.aquaflow.domain.User;
 import br.edu.aquaflow.domain.enums.InvoiceStatus;
@@ -14,6 +15,7 @@ import br.edu.aquaflow.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -74,23 +76,31 @@ public class BillingService {
     public void registerPayment(UUID invoiceId, String paymentMethod, UUID registeredByUserId) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new IllegalArgumentException("Fatura não encontrada"));
-        User registeredBy = userRepository.findById(registeredByUserId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
-
-        Transaction transaction = new Transaction();
-        transaction.setTenant(invoice.getTenant());
-        transaction.setType(TransactionType.INCOME);
-        transaction.setCategory("tuition");
-        transaction.setReferenceType("invoice");
-        transaction.setReferenceId(invoice.getId());
-        transaction.setAmount(invoice.getAmount());
-        transaction.setPaymentMethod(paymentMethod);
-        transaction.setPaidAt(Instant.now());
-        transaction.setCreatedBy(registeredBy);
-        transactionRepository.save(transaction);
+        registerIncome(invoice.getTenant(), "tuition", "invoice", invoice.getId(),
+                invoice.getAmount(), paymentMethod, registeredByUserId);
 
         invoice.setStatus(InvoiceStatus.PAID);
         invoice.setPaidAt(Instant.now());
         invoiceRepository.save(invoice);
+    }
+
+    /** Lança uma entrada no caixa (mensalidade, venda da loja...). */
+    @Transactional
+    public void registerIncome(Tenant tenant, String category, String referenceType, UUID referenceId,
+                               BigDecimal amount, String paymentMethod, UUID registeredByUserId) {
+        User registeredBy = userRepository.findById(registeredByUserId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+
+        Transaction transaction = new Transaction();
+        transaction.setTenant(tenant);
+        transaction.setType(TransactionType.INCOME);
+        transaction.setCategory(category);
+        transaction.setReferenceType(referenceType);
+        transaction.setReferenceId(referenceId);
+        transaction.setAmount(amount);
+        transaction.setPaymentMethod(paymentMethod);
+        transaction.setPaidAt(Instant.now());
+        transaction.setCreatedBy(registeredBy);
+        transactionRepository.save(transaction);
     }
 }

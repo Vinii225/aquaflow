@@ -1,13 +1,20 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: head('Loja', 'Equipamentos de natação usados nas aulas da AquaFlow: óculos, toucas, pranchas, nadadeiras e mais.')}"></head>
 <body class="home-page">
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <main class="container pb-5">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+  <div class="alert alert-success d-flex flex-wrap align-items-center justify-content-between gap-2" role="status"
+       th:if="${addedProductName}">
+    <span><i class="bi bi-bag-check me-1" aria-hidden="true"></i> <strong th:text="${addedProductName}">Óculos</strong> foi para o carrinho.</span>
+    <a class="btn btn-sm btn-accent" th:href="@{/loja/carrinho}">Ver carrinho e finalizar</a>
+  </div>
+
   <header class="page-head">
     <h1>Loja</h1>
-    <p>Os equipamentos que usamos nas aulas. A compra é feita na recepção da escola.</p>
+    <p>Os equipamentos que usamos nas aulas. Compre pelo site e retire na recepção da escola.</p>
     <p class="page-head-note" th:if="${not #lists.isEmpty(catalog.planDiscounts)}">
       <i class="bi bi-tag" aria-hidden="true"></i>
       Alunos têm desconto conforme o plano:
@@ -20,13 +27,24 @@
     <h2 class="product-section-title" th:text="${entry.key.label}">Acessórios</h2>
     <div class="row g-4">
       <div class="col-sm-6 col-lg-4" th:each="p : ${entry.value}">
-        <article class="product-card h-100">
+        <article class="product-card h-100" th:id="'produto-' + ${p.id}"
+                 th:classappend="${addedProductId != null and addedProductId == p.id} ? 'product-card-added'">
           <img class="product-img" th:if="${p.imagePath}" th:src="@{${p.imagePath}}" th:alt="${p.name}"
                width="800" height="600" loading="lazy">
           <div class="product-body">
             <h3 class="product-name" th:text="${p.name}">Óculos de natação</h3>
             <p class="product-desc" th:if="${p.description}" th:text="${p.description}">Descrição</p>
-            <p class="product-price mb-0">R$ <span th:text="${#numbers.formatDecimal(p.price, 1, 'POINT', 2, 'COMMA')}">49,90</span></p>
+            <div class="product-buy">
+              <p class="product-price mb-0">R$ <span th:text="${#numbers.formatDecimal(p.price, 1, 'POINT', 2, 'COMMA')}">49,90</span></p>
+              <form th:action="@{/loja/carrinho}" method="post" sec:authorize="!isAuthenticated() or hasRole('STUDENT')">
+                <input type="hidden" name="productId" th:value="${p.id}">
+                <input type="hidden" name="productName" th:value="${p.name}">
+                <button type="submit" class="btn btn-outline-primary btn-sm product-add">
+                  <i class="bi bi-bag-plus" aria-hidden="true"></i> Adicionar
+                  <span class="visually-hidden" th:text="${p.name}">produto</span>
+                </button>
+              </form>
+            </div>
           </div>
         </article>
       </div>
