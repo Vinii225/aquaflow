@@ -4,7 +4,7 @@
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<main class="container" style="max-width: 560px;">
+<main id="conteudo" tabindex="-1" class="container" style="max-width: 560px;">
   <div class="card card-aquaflow p-4">
     <h1 class="h4 mb-3" th:text="${subscription.id} ? 'Editar assinatura' : 'Nova assinatura'">Assinatura</h1>
 

@@ -4,7 +4,7 @@
 <body>
 <div th:replace="~{fragments/navbar :: navbar}"></div>
 
-<main class="container">
+<main id="conteudo" tabindex="-1" class="container">
   <div th:replace="~{fragments/alerts :: alerts}"></div>
 
   <a class="d-inline-flex align-items-center gap-1 mb-3 text-decoration-none" th:href="@{/plataforma/mensagens}">

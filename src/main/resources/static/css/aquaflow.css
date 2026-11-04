@@ -1577,3 +1577,24 @@ a {
     justify-self: start;
   }
 }
+/* Atalho de teclado: aparece só ao receber foco (Tab no início da página) */
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1100;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--color-card);
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+main:focus {
+  outline: none;
+}
