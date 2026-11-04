@@ -32,8 +32,8 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                // Volta para a página que pediu o login (ex.: contratação de plano); sem ela, vai para o início
-                .defaultSuccessUrl("/", false)
+                // Volta para a página que pediu o login (ex.: contratação de plano); sem ela, vai para o painel do papel
+                .defaultSuccessUrl("/painel", false)
                 .failureUrl("/login?error")
                 .permitAll()
             )
