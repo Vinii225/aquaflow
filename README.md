@@ -6,7 +6,7 @@
 ![Spring Boot 3](https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F?logo=springboot&logoColor=white)
 ![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
 
-Sistema de gestão para escola de natação: página institucional, planos mensais, loja, piscinas, turmas, grade de horários, reservas de alunos, chamada de presença e financeiro.
+Plataforma de gestão para escolas de natação, com várias escolas e dados separados por escola: página institucional, planos mensais, loja, piscinas, turmas, grade de horários, reservas de alunos, chamada de presença e financeiro.
 
 **Homologação:** https://aquaflow-9h8a.onrender.com
 
@@ -206,9 +206,15 @@ Planejamento e sprints no [Trello](https://trello.com/b/EetgQnZH/aquaflow-projet
 - [x] MVP: página institucional, agenda, reservas, chamada e financeiro
 - [x] Planos mensais (PB-01)
 - [x] Catálogo de produtos de natação: listagem (PB-03)
-- [ ] Busca e filtro no catálogo (PB-03)
-- [ ] Contratação de plano com pagamento online (PB-02)
-- [ ] Carrinho e checkout (PB-04)
+- [x] Contratação de plano (PB-02) e carrinho/checkout da loja (PB-04), v0.2.0
+- [x] Busca e filtro no catálogo (PB-03), v0.3.0
+- [x] Pagamento online em sandbox (Mercado Pago) na contratação e na loja, v0.3.0
+- [x] Multi-escolas, fase 1: dados separados por escola (PB-09), v0.3.0
+- [ ] Multi-escolas, fase 2: cadastro de escolas e escolha da escola no login (PB-09)
+- [ ] Site público por escola em `/e/{slug}`
+- [ ] Área do aluno (PB-05)
+
+Notas das versões: [v0.3.0](docs/release-v0.3.0.md) · roteiro de teste da V3: [docs/roteiro-teste-v3.md](docs/roteiro-teste-v3.md)
 
 ## Créditos
 
