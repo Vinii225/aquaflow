@@ -23,6 +23,42 @@
     </p>
   </header>
 
+  <form class="store-filters" th:action="@{/loja}" method="get" role="search" aria-label="Buscar e filtrar produtos"
+        th:with="f=${catalog.filter}" th:if="${catalog.total > 0}">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-lg-4">
+        <label class="form-label" for="busca">Buscar produto</label>
+        <input class="form-control" type="search" id="busca" name="q" th:value="${f.q}"
+               placeholder="Ex.: óculos, touca" maxlength="100" autocomplete="off">
+      </div>
+      <div class="col-12 col-sm-6 col-lg-3">
+        <label class="form-label" for="categoria">Categoria</label>
+        <select class="form-select" id="categoria" name="categoria">
+          <option value="">Todas</option>
+          <option th:each="c : ${catalog.categories}" th:value="${c.slug}" th:text="${c.label}"
+                  th:selected="${f.category == c}">Acessórios</option>
+        </select>
+      </div>
+      <div class="col-6 col-sm-3 col-lg-2">
+        <label class="form-label" for="preco-min">Preço mín. (R$)</label>
+        <input class="form-control" type="number" id="preco-min" name="min" min="0" step="0.01" inputmode="decimal"
+               th:value="${f.min}">
+      </div>
+      <div class="col-6 col-sm-3 col-lg-2">
+        <label class="form-label" for="preco-max">Preço máx. (R$)</label>
+        <input class="form-control" type="number" id="preco-max" name="max" min="0" step="0.01" inputmode="decimal"
+               th:value="${f.max}">
+      </div>
+      <div class="col-12 col-lg-1 d-grid">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-search" aria-hidden="true"></i> Filtrar</button>
+      </div>
+    </div>
+    <p class="store-filters-summary mb-0" th:if="${f.active}" role="status">
+      <span th:text="${catalog.found} + (${catalog.found} == 1 ? ' produto encontrado' : ' produtos encontrados')">2 produtos encontrados</span>
+      · <a th:href="@{/loja}">Limpar filtros</a>
+    </p>
+  </form>
+
   <section class="product-section" th:each="entry : ${catalog.productsByCategory}">
     <h2 class="product-section-title" th:text="${entry.key.label}">Acessórios</h2>
     <div class="row g-4">
@@ -39,6 +75,12 @@
               <form th:action="@{/loja/carrinho}" method="post" sec:authorize="!isAuthenticated() or hasRole('STUDENT')">
                 <input type="hidden" name="productId" th:value="${p.id}">
                 <input type="hidden" name="productName" th:value="${p.name}">
+                <th:block th:with="f=${catalog.filter}">
+                  <input type="hidden" name="q" th:if="${f.q}" th:value="${f.q}">
+                  <input type="hidden" name="categoria" th:if="${f.category}" th:value="${f.categorySlug}">
+                  <input type="hidden" name="min" th:if="${f.min}" th:value="${f.min}">
+                  <input type="hidden" name="max" th:if="${f.max}" th:value="${f.max}">
+                </th:block>
                 <button type="submit" class="btn btn-outline-primary btn-sm product-add">
                   <i class="bi bi-bag-plus" aria-hidden="true"></i> Adicionar
                   <span class="visually-hidden" th:text="${p.name}">produto</span>
@@ -51,7 +93,13 @@
     </div>
   </section>
 
-  <div class="card card-aquaflow p-5 text-center" th:if="${catalog.empty}">
+  <div class="card card-aquaflow p-5 text-center" th:if="${catalog.nothingFound}">
+    <p class="fw-semibold mb-1">Nenhum produto encontrado com esses filtros.</p>
+    <p class="text-muted mb-3">Tente outro nome, outra categoria ou uma faixa de preço maior.</p>
+    <div><a class="btn btn-outline-primary" th:href="@{/loja}">Limpar filtros e ver todos</a></div>
+  </div>
+
+  <div class="card card-aquaflow p-5 text-center" th:if="${catalog.empty and not catalog.nothingFound}">
     <p class="text-muted mb-0">Nenhum produto disponível no momento.</p>
   </div>
 </main>
