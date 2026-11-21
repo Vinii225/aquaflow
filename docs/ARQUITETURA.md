@@ -38,11 +38,19 @@ public String index(Model model) {
 | --- | --- |
 | Nome dos dias da semana | `Weekday` (1 = segunda, igual ao banco) |
 | Usuários ativos de um papel | `tenantUserRepository.findActiveUsersByRole(tenantId, role)` |
-| Escola atual | `TenantContext.getTenantId()` |
-| Nome, endereço e telefone da escola | `AquaflowProperties.school()` (nos templates: `${schoolName}`, `${schoolAddress}`, `${schoolPhone}`, `${schoolPhoneHref}`) |
+| Escola atual | `TenantContext.getTenantId()` / `getTenant()` (logado: escola do vínculo; anônimo: escola padrão) |
+| Rodar algo como outra escola (webhook, teste) | `tenantContext.runAs(tenantId, () -> ...)` |
+| Nome, endereço e telefone da escola | tabela `tenants` (nos templates: `${schoolName}`, `${schoolAddress}`, `${schoolPhone}`, `${schoolPhoneHref}`) |
 | `<head>` de uma página | `<head th:replace="~{fragments/head :: head('Título', 'Descrição ou null')}"></head>` |
 | Menu, rodapé e alertas | `fragments/navbar`, `fragments/footer`, `fragments/alerts` |
 | Item ativo no menu | `${currentPath}` (preenchido em `GlobalModelAttributes`) |
+
+## Multi-escolas (tenant)
+
+- Toda tabela de dados da escola tem `tenant_id`. **Toda consulta filtra pela escola atual**: use `findByTenantId...` ou `findByIdAndTenantId(id, tenantContext.getTenantId())`, nunca `findById` puro em tela de escola.
+- Id de outra escola responde 404. Formulários conferem se a piscina, turma, professor ou aluno escolhido é da escola.
+- A escola da sessão é definida no login (`AquaflowUserDetailsService`) e guardada em `AquaflowUserDetails.getTenantId()`.
+- Telas novas ganham um caso em `MultiTenantIsolationTest`.
 
 ## Banco de dados
 
