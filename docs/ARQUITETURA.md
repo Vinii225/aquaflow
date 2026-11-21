@@ -45,6 +45,12 @@ public String index(Model model) {
 | Menu, rodapé e alertas | `fragments/navbar`, `fragments/footer`, `fragments/alerts` |
 | Item ativo no menu | `${currentPath}` (preenchido em `GlobalModelAttributes`) |
 
+## Pagamento online
+
+- Interface `service/payment/GatewayPagamento`, com `MercadoPagoGateway` (com `MERCADOPAGO_ACCESS_TOKEN`) e `PagamentoSimuladoGateway` (sem chave). A escolha fica em `PaymentGatewayConfig`.
+- `PaymentService` inicia a cobrança e aplica o status (aprovado, pendente ou recusado) na fatura ou no pedido. `apply` é idempotente e trava a linha (`lockById`).
+- Testes usam o simulado: `setNextOutcome(...)` escolhe o resultado e `changeStatus(...)` simula a mudança depois (veja `PaymentFlowTest`). Nenhum teste chama a API real.
+
 ## Multi-escolas (tenant)
 
 - Toda tabela de dados da escola tem `tenant_id`. **Toda consulta filtra pela escola atual**: use `findByTenantId...` ou `findByIdAndTenantId(id, tenantContext.getTenantId())`, nunca `findById` puro em tela de escola.

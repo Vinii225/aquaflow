@@ -1,4 +1,13 @@
-# Créditos das imagens
+# Créditos
+
+## Serviços de terceiros
+
+| Serviço | Uso | Licença / termos |
+| --- | --- | --- |
+| [Mercado Pago](https://www.mercadopago.com.br/developers) (Checkout Pro, modo de teste) | Pagamento online da contratação de plano e da loja (S4-06) | Termos de uso do Mercado Pago; sem custo no sandbox |
+| [SDK Java do Mercado Pago](https://github.com/mercadopago/sdk-java) (`com.mercadopago:sdk-java` 3.7.0) | Criação da preferência, consulta do pagamento e validação da assinatura do webhook | [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) |
+
+## Imagens
 
 Fotos da loja obtidas na [Wikimedia Commons](https://commons.wikimedia.org), recortadas para 800 × 600.
 
