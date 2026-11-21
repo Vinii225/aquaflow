@@ -11,15 +11,15 @@ import br.edu.aquaflow.repository.PlanRepository;
 import br.edu.aquaflow.repository.ProductRepository;
 import br.edu.aquaflow.repository.StoreOrderRepository;
 import br.edu.aquaflow.repository.UserRepository;
-import br.edu.aquaflow.service.BillingService;
+import br.edu.aquaflow.domain.enums.PaymentStatus;
 import br.edu.aquaflow.service.PlanEnrollmentService;
 import br.edu.aquaflow.service.TenantContext;
+import br.edu.aquaflow.service.payment.PaymentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,8 +31,9 @@ import java.util.stream.Collectors;
 
 /**
  * Carrinho e checkout da loja (PB-04). O desconto vem do plano ativo do aluno
- * ({@code plans.product_discount_percent}). Como na contratação de plano, o pagamento
- * ainda é simulado e o pedido já nasce pago, para retirada na recepção.
+ * ({@code plans.product_discount_percent}). O pedido nasce aguardando pagamento e é cobrado pelo
+ * {@link PaymentService} (Mercado Pago em sandbox ou simulado); aprovado, fica pago para retirada
+ * na recepção.
  */
 @Service
 public class StoreService {
@@ -52,6 +53,10 @@ public class StoreService {
         }
     }
 
+    /** Pedido criado e, se o pagamento é no gateway, para onde mandar o aluno. */
+    public record CheckoutResult(UUID orderId, String paymentRedirectUrl) {
+    }
+
     public static class EmptyCartException extends RuntimeException {
         public EmptyCartException() {
             super("Seu carrinho está vazio.");
@@ -64,7 +69,7 @@ public class StoreService {
     private final StoreOrderRepository orderRepository;
     private final UserRepository userRepository;
     private final PlanEnrollmentService enrollmentService;
-    private final BillingService billingService;
+    private final PaymentService paymentService;
     private final TenantContext tenantContext;
 
     public StoreService(ShoppingCart cart,
@@ -73,7 +78,7 @@ public class StoreService {
                         StoreOrderRepository orderRepository,
                         UserRepository userRepository,
                         PlanEnrollmentService enrollmentService,
-                        BillingService billingService,
+                        PaymentService paymentService,
                         TenantContext tenantContext) {
         this.cart = cart;
         this.productRepository = productRepository;
@@ -81,7 +86,7 @@ public class StoreService {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.enrollmentService = enrollmentService;
-        this.billingService = billingService;
+        this.paymentService = paymentService;
         this.tenantContext = tenantContext;
     }
 
@@ -129,8 +134,9 @@ public class StoreService {
                 percent, discount, subtotal.subtract(discount));
     }
 
+    /** @param baseUrl endereço público do site, para o gateway devolver o aluno e notificar */
     @Transactional
-    public UUID checkout(UUID studentId, PaymentMethod paymentMethod) {
+    public CheckoutResult checkout(UUID studentId, PaymentMethod paymentMethod, String baseUrl) {
         CartView view = view(studentId);
         if (view.isEmpty()) {
             throw new EmptyCartException();
@@ -141,13 +147,12 @@ public class StoreService {
         StoreOrder order = new StoreOrder();
         order.setTenant(tenantContext.getTenant());
         order.setStudent(student);
-        order.setStatus(OrderStatus.PAID);
+        order.setStatus(OrderStatus.PENDING);
         order.setSubtotal(view.subtotal());
         order.setDiscountPercent((short) view.discountPercent());
         order.setDiscountAmount(view.discount());
         order.setTotal(view.total());
         order.setPaymentMethod(paymentMethod.getCode());
-        order.setPaidAt(Instant.now());
         for (CartLine line : view.lines()) {
             StoreOrderItem item = new StoreOrderItem();
             item.setProduct(line.product());
@@ -159,12 +164,22 @@ public class StoreService {
         }
         orderRepository.save(order);
 
-        if (order.getTotal().signum() > 0) {
-            billingService.registerIncome(order.getTenant(), "store", "store_order", order.getId(),
-                    order.getTotal(), paymentMethod.getCode(), studentId);
+        // A entrada no caixa é lançada pelo PaymentService quando o pagamento é aprovado
+        PaymentService.Start payment = paymentService.startOrder(order, paymentMethod, student, baseUrl);
+        if (payment.status() != PaymentStatus.REJECTED) {
+            cart.clear();
         }
-        cart.clear();
-        return order.getId();
+        return new CheckoutResult(order.getId(), payment.redirectUrl());
+    }
+
+    /** Pagamento recusado no gateway: os itens do pedido voltam para o carrinho. */
+    @Transactional(readOnly = true)
+    public void restoreCart(UUID orderId, UUID studentId) {
+        findOrder(orderId, studentId)
+                .filter(o -> o.getStatus() == OrderStatus.REJECTED)
+                .ifPresent(o -> o.getItems().stream()
+                        .filter(i -> i.getProduct() != null)
+                        .forEach(i -> cart.add(i.getProduct().getId(), i.getQuantity())));
     }
 
     @Transactional(readOnly = true)

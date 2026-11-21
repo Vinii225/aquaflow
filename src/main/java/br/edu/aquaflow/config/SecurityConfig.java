@@ -2,6 +2,7 @@ package br.edu.aquaflow.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +22,9 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/planos/*/contratar", "/planos/contratacao/**",
-                        "/loja/checkout", "/loja/pedidos/**").hasRole("STUDENT")
+                        "/loja/checkout", "/loja/pedidos/**", "/pagamentos/retorno/**").hasRole("STUDENT")
+                // Notificação do Mercado Pago: sem login; a assinatura é conferida no controller
+                .requestMatchers(HttpMethod.POST, "/pagamentos/webhook/mercadopago").permitAll()
                 .requestMatchers("/", "/planos", "/planos/contato", "/loja", "/loja/carrinho", "/loja/carrinho/**", "/login", "/register", "/css/**", "/img/**", "/webjars/**", "/error").permitAll()
                 .requestMatchers("/plataforma/**").hasRole("PLATFORM_ADMIN")
                 .requestMatchers("/admin/**").hasRole("SCHOOL_ADMIN")
@@ -42,7 +45,10 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/")
                 .permitAll()
             )
-            .csrf(csrf -> csrf.csrfTokenRequestHandler(eagerCsrfHandler()));
+            .csrf(csrf -> csrf
+                .csrfTokenRequestHandler(eagerCsrfHandler())
+                // Chamada servidor a servidor, sem sessão nem formulário
+                .ignoringRequestMatchers("/pagamentos/webhook/**"));
 
         return http.build();
     }

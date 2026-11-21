@@ -4,6 +4,8 @@ import br.edu.aquaflow.domain.Plan;
 import br.edu.aquaflow.domain.enums.PaymentMethod;
 import br.edu.aquaflow.security.AquaflowUserDetails;
 import br.edu.aquaflow.service.PlanEnrollmentService;
+import br.edu.aquaflow.service.payment.PaymentGatewayException;
+import br.edu.aquaflow.service.payment.PaymentService;
 import br.edu.aquaflow.web.dto.EnrollmentForm;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -25,9 +27,15 @@ import java.util.UUID;
 public class PlanEnrollmentController {
 
     private final PlanEnrollmentService enrollmentService;
+    private final PaymentService paymentService;
+    private final PublicBaseUrl publicBaseUrl;
 
-    public PlanEnrollmentController(PlanEnrollmentService enrollmentService) {
+    public PlanEnrollmentController(PlanEnrollmentService enrollmentService,
+                                    PaymentService paymentService,
+                                    PublicBaseUrl publicBaseUrl) {
         this.enrollmentService = enrollmentService;
+        this.paymentService = paymentService;
+        this.publicBaseUrl = publicBaseUrl;
     }
 
     @GetMapping("/planos/{planId}/contratar")
@@ -60,12 +68,19 @@ public class PlanEnrollmentController {
         }
 
         try {
-            UUID subscriptionId = enrollmentService.enroll(
-                    currentUser.getUserId(), planId, form.getDueDay(), form.getPaymentMethod());
-            return "redirect:/planos/contratacao/" + subscriptionId;
+            var enrollment = enrollmentService.enroll(currentUser.getUserId(), planId, form.getDueDay(),
+                    form.getPaymentMethod(), publicBaseUrl.resolve());
+            if (enrollment.paymentRedirectUrl() != null) {
+                return "redirect:" + enrollment.paymentRedirectUrl();
+            }
+            return "redirect:/planos/contratacao/" + enrollment.subscriptionId();
         } catch (PlanEnrollmentService.AlreadySubscribedException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/planos";
+        } catch (PaymentGatewayException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Não foi possível iniciar o pagamento agora. Nada foi cobrado; tente de novo em instantes.");
+            return "redirect:/planos/" + planId + "/contratar";
         }
     }
 
@@ -84,6 +99,7 @@ public class PlanEnrollmentController {
         model.addAttribute("plan", plan);
         model.addAttribute("dueDays", PlanEnrollmentService.DUE_DAYS);
         model.addAttribute("paymentMethods", PaymentMethod.values());
+        model.addAttribute("onlinePayment", paymentService.isExternalGateway());
         return "plans/checkout";
     }
 }

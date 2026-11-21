@@ -7,9 +7,25 @@
 <main id="conteudo" tabindex="-1" class="container pb-5">
   <section class="card-aquaflow confirmation-card mx-auto p-4 p-md-5" th:object="${order}">
     <div class="text-center">
-      <span class="confirmation-icon" aria-hidden="true"><i class="bi bi-bag-check"></i></span>
-      <h1 class="checkout-title mt-3 mb-2">Pedido confirmado</h1>
-      <p class="text-muted mb-1">Mostre o código abaixo na recepção para retirar seus produtos.</p>
+      <div th:replace="~{fragments/alerts :: alerts}"></div>
+      <th:block th:switch="*{status.name()}">
+        <th:block th:case="'PENDING'">
+          <span class="confirmation-icon confirmation-icon-pending" aria-hidden="true"><i class="bi bi-hourglass-split"></i></span>
+          <h1 class="checkout-title mt-3 mb-2">Pagamento em análise</h1>
+          <p class="text-muted mb-1">Assim que o pagamento for confirmado, o pedido fica liberado para retirada na recepção.</p>
+        </th:block>
+        <th:block th:case="'REJECTED'">
+          <span class="confirmation-icon confirmation-icon-error" aria-hidden="true"><i class="bi bi-x-lg"></i></span>
+          <h1 class="checkout-title mt-3 mb-2">Pagamento recusado</h1>
+          <p class="text-muted mb-1">Nada foi cobrado. Os itens voltaram para o carrinho para você tentar de novo.</p>
+          <p class="mb-3"><a class="btn btn-accent btn-sm" th:href="@{/loja/carrinho}">Ir para o carrinho</a></p>
+        </th:block>
+        <th:block th:case="*">
+          <span class="confirmation-icon" aria-hidden="true"><i class="bi bi-bag-check"></i></span>
+          <h1 class="checkout-title mt-3 mb-2">Pedido confirmado</h1>
+          <p class="text-muted mb-1">Mostre o código abaixo na recepção para retirar seus produtos.</p>
+        </th:block>
+      </th:block>
       <p class="order-code mb-4" th:text="*{code}">0F85B0DC</p>
     </div>
 
@@ -30,7 +46,7 @@
         <dd th:text="'− R$ ' + ${#numbers.formatDecimal(order.discountAmount, 1, 'POINT', 2, 'COMMA')}">− R$ 9,98</dd>
       </div>
       <div>
-        <dt>Total pago</dt>
+        <dt>Total</dt>
         <dd th:text="'R$ ' + ${#numbers.formatDecimal(order.total, 1, 'POINT', 2, 'COMMA')}">R$ 89,82</dd>
       </div>
       <div>

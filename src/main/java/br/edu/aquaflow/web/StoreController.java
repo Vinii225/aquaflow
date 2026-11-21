@@ -2,6 +2,8 @@ package br.edu.aquaflow.web;
 
 import br.edu.aquaflow.domain.enums.PaymentMethod;
 import br.edu.aquaflow.security.AquaflowUserDetails;
+import br.edu.aquaflow.service.payment.PaymentGatewayException;
+import br.edu.aquaflow.service.payment.PaymentService;
 import br.edu.aquaflow.service.store.StoreService;
 import br.edu.aquaflow.web.dto.StoreCheckoutForm;
 import jakarta.validation.Valid;
@@ -25,9 +27,13 @@ import java.util.UUID;
 public class StoreController {
 
     private final StoreService storeService;
+    private final PaymentService paymentService;
+    private final PublicBaseUrl publicBaseUrl;
 
-    public StoreController(StoreService storeService) {
+    public StoreController(StoreService storeService, PaymentService paymentService, PublicBaseUrl publicBaseUrl) {
         this.storeService = storeService;
+        this.paymentService = paymentService;
+        this.publicBaseUrl = publicBaseUrl;
     }
 
     @GetMapping("/loja/carrinho")
@@ -78,11 +84,18 @@ public class StoreController {
             return checkoutPage(currentUser, model);
         }
         try {
-            UUID orderId = storeService.checkout(currentUser.getUserId(), form.getPaymentMethod());
-            return "redirect:/loja/pedidos/" + orderId;
+            var result = storeService.checkout(currentUser.getUserId(), form.getPaymentMethod(), publicBaseUrl.resolve());
+            if (result.paymentRedirectUrl() != null) {
+                return "redirect:" + result.paymentRedirectUrl();
+            }
+            return "redirect:/loja/pedidos/" + result.orderId();
         } catch (StoreService.EmptyCartException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/loja/carrinho";
+        } catch (PaymentGatewayException e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Não foi possível iniciar o pagamento agora. Nada foi cobrado; tente de novo em instantes.");
+            return "redirect:/loja/checkout";
         }
     }
 
@@ -108,6 +121,7 @@ public class StoreController {
         }
         model.addAttribute("cart", cart);
         model.addAttribute("paymentMethods", PaymentMethod.values());
+        model.addAttribute("onlinePayment", paymentService.isExternalGateway());
         return "store/checkout";
     }
 
