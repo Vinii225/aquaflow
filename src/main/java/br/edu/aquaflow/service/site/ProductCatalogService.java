@@ -15,15 +15,28 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/** Catálogo público da loja (PB-03, listagem). Compra e carrinho ficam para o PB-04. */
+/** Catálogo público da loja (PB-03): listagem, busca e filtros. Só produtos da escola atual. */
 @Service
 public class ProductCatalogService {
 
-    /** Produtos agrupados por categoria (na ordem do enum) e os descontos de aluno por plano. */
-    public record Catalog(Map<ProductCategory, List<Product>> productsByCategory, List<PlanDiscount> planDiscounts) {
+    /**
+     * Produtos agrupados por categoria (na ordem do enum), os descontos de aluno por plano e o filtro aplicado.
+     * {@code total} conta os produtos ativos da escola antes do filtro.
+     */
+    public record Catalog(Map<ProductCategory, List<Product>> productsByCategory, List<PlanDiscount> planDiscounts,
+                          ProductFilter filter, int found, int total) {
 
         public boolean isEmpty() {
             return productsByCategory.isEmpty();
+        }
+
+        /** Há produtos na loja, mas nenhum passou no filtro. */
+        public boolean isNothingFound() {
+            return isEmpty() && total > 0 && filter.isActive();
+        }
+
+        public List<ProductCategory> getCategories() {
+            return List.of(ProductCategory.values());
         }
     }
 
@@ -44,10 +57,20 @@ public class ProductCatalogService {
 
     @Transactional(readOnly = true)
     public Catalog load() {
+        return load(ProductFilter.NONE);
+    }
+
+    /**
+     * O catálogo de uma escola tem poucas dezenas de itens: a consulta traz os produtos ativos da escola
+     * e o filtro roda em memória, o que permite buscar sem acento ("oculos" acha "Óculos").
+     */
+    @Transactional(readOnly = true)
+    public Catalog load(ProductFilter filter) {
         UUID tenantId = tenantContext.getTenantId();
 
-        Map<ProductCategory, List<Product>> byCategory = productRepository
-                .findByTenantIdAndActiveTrueOrderByDisplayOrderAsc(tenantId).stream()
+        List<Product> all = productRepository.findByTenantIdAndActiveTrueOrderByDisplayOrderAsc(tenantId);
+        List<Product> found = all.stream().filter(filter::matches).toList();
+        Map<ProductCategory, List<Product>> byCategory = found.stream()
                 .collect(Collectors.groupingBy(Product::getCategory,
                         () -> new EnumMap<>(ProductCategory.class), Collectors.toList()));
 
@@ -56,6 +79,6 @@ public class ProductCatalogService {
                 .map(p -> new PlanDiscount(p.getName(), p.getProductDiscountPercent()))
                 .toList();
 
-        return new Catalog(byCategory, discounts);
+        return new Catalog(byCategory, discounts, filter, found.size(), all.size());
     }
 }

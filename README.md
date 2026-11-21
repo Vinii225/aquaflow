@@ -23,7 +23,7 @@ Sistema de gestão para escola de natação: página institucional, planos mensa
 **Público**
 - Página inicial: turmas e horários, resumo dos planos, professores, piscinas e contato (tudo vindo do banco)
 - Planos mensais (`/planos`) lado a lado, com plano em destaque e "Falar com o vendedor"
-- Loja (`/loja`): catálogo de equipamentos por categoria, com o desconto de aluno de cada plano
+- Loja (`/loja`): catálogo de equipamentos por categoria, com o desconto de aluno de cada plano, busca por nome e filtros por categoria e faixa de preço (o link com os filtros pode ser compartilhado, ex.: `/loja?q=oculos&categoria=acessorios&max=60`)
 - Cadastro e login de aluno
 
 **Por papel**

@@ -46,6 +46,10 @@ public class StoreController {
     public String add(@RequestParam UUID productId,
                       @RequestParam(defaultValue = "1") int quantity,
                       @RequestParam(required = false) String productName,
+                      @RequestParam(required = false) String q,
+                      @RequestParam(required = false) String categoria,
+                      @RequestParam(required = false) String min,
+                      @RequestParam(required = false) String max,
                       RedirectAttributes redirectAttributes) {
         if (storeService.addToCart(productId, quantity)) {
             redirectAttributes.addFlashAttribute("addedProductId", productId);
@@ -53,6 +57,11 @@ public class StoreController {
         } else {
             redirectAttributes.addFlashAttribute("errorMessage", "Este produto não está mais disponível.");
         }
+        // Volta para a loja com a mesma busca e os mesmos filtros (o Spring codifica os valores na URL)
+        keepFilter(redirectAttributes, "q", q);
+        keepFilter(redirectAttributes, "categoria", categoria);
+        keepFilter(redirectAttributes, "min", min);
+        keepFilter(redirectAttributes, "max", max);
         return "redirect:/loja#produto-" + productId;
     }
 
@@ -123,6 +132,12 @@ public class StoreController {
         model.addAttribute("paymentMethods", PaymentMethod.values());
         model.addAttribute("onlinePayment", paymentService.isExternalGateway());
         return "store/checkout";
+    }
+
+    private static void keepFilter(RedirectAttributes redirectAttributes, String name, String value) {
+        if (value != null && !value.isBlank()) {
+            redirectAttributes.addAttribute(name, value.trim());
+        }
     }
 
     private static UUID studentId(AquaflowUserDetails user) {
