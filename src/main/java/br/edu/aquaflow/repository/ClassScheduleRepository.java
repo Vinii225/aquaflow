@@ -6,10 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ClassScheduleRepository extends JpaRepository<ClassSchedule, UUID> {
     Page<ClassSchedule> findByTenantId(UUID tenantId, Pageable pageable);
     List<ClassSchedule> findByTenantId(UUID tenantId);
-    List<ClassSchedule> findByTeacherId(UUID teacherId);
+    Optional<ClassSchedule> findByIdAndTenantId(UUID id, UUID tenantId);
 }

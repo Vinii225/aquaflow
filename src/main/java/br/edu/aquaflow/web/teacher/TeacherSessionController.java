@@ -8,10 +8,13 @@ import br.edu.aquaflow.repository.ClassSessionRepository;
 import br.edu.aquaflow.repository.StudentBookingRepository;
 import br.edu.aquaflow.security.AquaflowUserDetails;
 import br.edu.aquaflow.service.AttendanceService;
+import br.edu.aquaflow.service.TenantContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
@@ -27,22 +30,25 @@ public class TeacherSessionController {
     private final StudentBookingRepository studentBookingRepository;
     private final AttendanceRepository attendanceRepository;
     private final AttendanceService attendanceService;
+    private final TenantContext tenantContext;
 
     public TeacherSessionController(ClassSessionRepository classSessionRepository,
                                      StudentBookingRepository studentBookingRepository,
                                      AttendanceRepository attendanceRepository,
-                                     AttendanceService attendanceService) {
+                                     AttendanceService attendanceService,
+                                     TenantContext tenantContext) {
         this.classSessionRepository = classSessionRepository;
         this.studentBookingRepository = studentBookingRepository;
         this.attendanceRepository = attendanceRepository;
         this.attendanceService = attendanceService;
+        this.tenantContext = tenantContext;
     }
 
     @GetMapping
     public String list(@AuthenticationPrincipal AquaflowUserDetails currentUser, Model model) {
         LocalDate today = LocalDate.now();
-        var sessions = classSessionRepository.findByTeacherIdAndDateBetweenOrderByDateAscStartTimeAsc(
-                currentUser.getUserId(), today, today.plusWeeks(2));
+        var sessions = classSessionRepository.findByTenantIdAndTeacherIdAndDateBetweenOrderByDateAscStartTimeAsc(
+                tenantContext.getTenantId(), currentUser.getUserId(), today, today.plusWeeks(2));
         model.addAttribute("sessions", sessions);
         model.addAttribute("today", today);
         return "teacher/sessions";
@@ -50,7 +56,8 @@ public class TeacherSessionController {
 
     @GetMapping("/{id}/attendance")
     public String attendance(@PathVariable UUID id, Model model) {
-        ClassSession session = classSessionRepository.findById(id).orElseThrow();
+        ClassSession session = classSessionRepository.findByIdAndTenantId(id, tenantContext.getTenantId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         var bookings = studentBookingRepository.findByClassSessionIdAndStatus(id, BookingStatus.CONFIRMED);
 
         Map<UUID, AttendanceStatus> recorded = new HashMap<>();

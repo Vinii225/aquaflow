@@ -11,10 +11,12 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Instant;
@@ -58,7 +60,7 @@ public class AdminScheduleController {
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable UUID id, Model model) {
-        model.addAttribute("classSchedule", classScheduleRepository.findById(id).orElseThrow());
+        model.addAttribute("classSchedule", find(id));
         addOptions(model);
         return "admin/schedule-form";
     }
@@ -73,6 +75,15 @@ public class AdminScheduleController {
             bindingResult.rejectValue("endTime", "invalid", "O horário de término deve ser depois do início");
         }
 
+        UUID tenantId = tenantContext.getTenantId();
+        if (classSchedule.getSwimClass() != null && !classSchedule.getSwimClass().getTenant().getId().equals(tenantId)) {
+            bindingResult.rejectValue("swimClass", "invalid", "Escolha uma turma da escola");
+        }
+        if (classSchedule.getTeacher() != null && tenantUserRepository.findActiveUsersByRole(tenantId, TenantUserRole.TEACHER)
+                .stream().noneMatch(t -> t.getId().equals(classSchedule.getTeacher().getId()))) {
+            bindingResult.rejectValue("teacher", "invalid", "Escolha um professor da escola");
+        }
+
         if (bindingResult.hasErrors()) {
             addOptions(model);
             return "admin/schedule-form";
@@ -82,7 +93,7 @@ public class AdminScheduleController {
         if (isNew) {
             classSchedule.setTenant(tenantContext.getTenant());
         } else {
-            ClassSchedule existing = classScheduleRepository.findById(classSchedule.getId()).orElseThrow();
+            ClassSchedule existing = find(classSchedule.getId());
             classSchedule.setTenant(existing.getTenant());
             classSchedule.setCreatedAt(existing.getCreatedAt());
         }
@@ -95,9 +106,14 @@ public class AdminScheduleController {
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
-        classScheduleRepository.deleteById(id);
+        classScheduleRepository.delete(find(id));
         redirectAttributes.addFlashAttribute("successMessage", "Horário removido.");
         return "redirect:/admin/schedules";
+    }
+
+    private ClassSchedule find(UUID id) {
+        return classScheduleRepository.findByIdAndTenantId(id, tenantContext.getTenantId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     private void addOptions(Model model) {

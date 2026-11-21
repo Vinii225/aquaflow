@@ -13,8 +13,9 @@ import java.util.UUID;
 public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
     Page<Subscription> findByTenantId(UUID tenantId, Pageable pageable);
     List<Subscription> findByTenantIdAndStatus(UUID tenantId, SubscriptionStatus status);
-    List<Subscription> findByStudentId(UUID studentId);
-    Optional<Subscription> findFirstByStudentIdAndStatusOrderByStartDateDesc(UUID studentId, SubscriptionStatus status);
+    Optional<Subscription> findByIdAndTenantId(UUID id, UUID tenantId);
+    Optional<Subscription> findFirstByTenantIdAndStudentIdAndStatusOrderByStartDateDesc(
+            UUID tenantId, UUID studentId, SubscriptionStatus status);
 
     long countByTenantIdAndStatus(UUID tenantId, SubscriptionStatus status);
 }

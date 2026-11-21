@@ -169,17 +169,13 @@ public class StoreService {
 
     @Transactional(readOnly = true)
     public Optional<StoreOrder> findOrder(UUID orderId, UUID studentId) {
-        return orderRepository.findById(orderId)
-                .filter(o -> o.getStudent().getId().equals(studentId))
-                .map(o -> {
-                    o.getItems().size();
-                    return o;
-                });
+        return orderRepository.findByIdAndTenantId(orderId, tenantContext.getTenantId())
+                .filter(o -> o.getStudent().getId().equals(studentId));
     }
 
     @Transactional(readOnly = true)
     public List<StoreOrder> ordersOf(UUID studentId) {
-        return orderRepository.findByStudentIdOrderByCreatedAtDesc(studentId);
+        return orderRepository.findByTenantIdAndStudentIdOrderByCreatedAtDesc(tenantContext.getTenantId(), studentId);
     }
 
     private List<Product> findAvailable(Collection<UUID> ids) {

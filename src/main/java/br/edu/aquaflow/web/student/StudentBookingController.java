@@ -81,7 +81,8 @@ public class StudentBookingController {
 
     @GetMapping("/student/bookings")
     public String myBookings(@AuthenticationPrincipal AquaflowUserDetails currentUser, Model model) {
-        model.addAttribute("bookings", studentBookingRepository.findByStudentIdOrderByBookedAtDesc(currentUser.getUserId()));
+        model.addAttribute("bookings", studentBookingRepository.findByTenantIdAndStudentIdOrderByBookedAtDesc(
+                tenantContext.getTenantId(), currentUser.getUserId()));
         return "student/bookings";
     }
 

@@ -16,10 +16,10 @@ public interface ClassSessionRepository extends JpaRepository<ClassSession, UUID
     Page<ClassSession> findByTenantIdAndDateGreaterThanEqualOrderByDateAscStartTimeAsc(
             UUID tenantId, LocalDate from, Pageable pageable);
 
-    List<ClassSession> findByTeacherIdAndDateOrderByStartTimeAsc(UUID teacherId, LocalDate date);
+    Optional<ClassSession> findByIdAndTenantId(UUID id, UUID tenantId);
 
-    List<ClassSession> findByTeacherIdAndDateBetweenOrderByDateAscStartTimeAsc(
-            UUID teacherId, LocalDate from, LocalDate to);
+    List<ClassSession> findByTenantIdAndTeacherIdAndDateBetweenOrderByDateAscStartTimeAsc(
+            UUID tenantId, UUID teacherId, LocalDate from, LocalDate to);
 
     Optional<ClassSession> findByClassScheduleIdAndDate(UUID classScheduleId, LocalDate date);
 
@@ -28,6 +28,6 @@ public interface ClassSessionRepository extends JpaRepository<ClassSession, UUID
             UUID tenantId, LocalDate from, LocalDate to, SessionStatus status);
 
     @EntityGraph(attributePaths = "swimClass")
-    List<ClassSession> findByTeacherIdAndDateBetweenAndStatusOrderByDateAscStartTimeAsc(
-            UUID teacherId, LocalDate from, LocalDate to, SessionStatus status);
+    List<ClassSession> findByTenantIdAndTeacherIdAndDateBetweenAndStatusOrderByDateAscStartTimeAsc(
+            UUID tenantId, UUID teacherId, LocalDate from, LocalDate to, SessionStatus status);
 }

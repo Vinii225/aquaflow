@@ -11,7 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface StudentBookingRepository extends JpaRepository<StudentBooking, UUID> {
-    List<StudentBooking> findByStudentIdOrderByBookedAtDesc(UUID studentId);
+    List<StudentBooking> findByTenantIdAndStudentIdOrderByBookedAtDesc(UUID tenantId, UUID studentId);
+    Optional<StudentBooking> findByIdAndTenantId(UUID id, UUID tenantId);
     List<StudentBooking> findByClassSessionIdAndStatus(UUID classSessionId, BookingStatus status);
     long countByClassSessionIdAndStatus(UUID classSessionId, BookingStatus status);
     Optional<StudentBooking> findByStudentIdAndClassSessionId(UUID studentId, UUID classSessionId);

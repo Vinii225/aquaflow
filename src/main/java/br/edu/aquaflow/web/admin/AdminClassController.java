@@ -8,10 +8,12 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Instant;
@@ -51,7 +53,7 @@ public class AdminClassController {
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable UUID id, Model model) {
-        model.addAttribute("swimClass", swimClassRepository.findById(id).orElseThrow());
+        model.addAttribute("swimClass", find(id));
         addPools(model);
         return "admin/class-form";
     }
@@ -61,6 +63,9 @@ public class AdminClassController {
                         BindingResult bindingResult,
                         Model model,
                         RedirectAttributes redirectAttributes) {
+        if (swimClass.getPool() != null && !swimClass.getPool().getTenant().getId().equals(tenantContext.getTenantId())) {
+            bindingResult.rejectValue("pool", "invalid", "Escolha uma piscina da escola");
+        }
         if (bindingResult.hasErrors()) {
             addPools(model);
             return "admin/class-form";
@@ -70,7 +75,7 @@ public class AdminClassController {
         if (isNew) {
             swimClass.setTenant(tenantContext.getTenant());
         } else {
-            SwimClass existing = swimClassRepository.findById(swimClass.getId()).orElseThrow();
+            SwimClass existing = find(swimClass.getId());
             swimClass.setTenant(existing.getTenant());
             swimClass.setCreatedAt(existing.getCreatedAt());
         }
@@ -83,11 +88,16 @@ public class AdminClassController {
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
-        SwimClass swimClass = swimClassRepository.findById(id).orElseThrow();
+        SwimClass swimClass = find(id);
         swimClass.setDeletedAt(Instant.now());
         swimClassRepository.save(swimClass);
         redirectAttributes.addFlashAttribute("successMessage", "Turma removida.");
         return "redirect:/admin/classes";
+    }
+
+    private SwimClass find(UUID id) {
+        return swimClassRepository.findByIdAndTenantId(id, tenantContext.getTenantId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     private void addPools(Model model) {

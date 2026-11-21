@@ -23,20 +23,23 @@ public class AttendanceService {
     private final StudentBookingRepository studentBookingRepository;
     private final ClassSessionRepository classSessionRepository;
     private final UserRepository userRepository;
+    private final TenantContext tenantContext;
 
     public AttendanceService(AttendanceRepository attendanceRepository,
                               StudentBookingRepository studentBookingRepository,
                               ClassSessionRepository classSessionRepository,
-                              UserRepository userRepository) {
+                              UserRepository userRepository,
+                              TenantContext tenantContext) {
         this.attendanceRepository = attendanceRepository;
         this.studentBookingRepository = studentBookingRepository;
         this.classSessionRepository = classSessionRepository;
         this.userRepository = userRepository;
+        this.tenantContext = tenantContext;
     }
 
     @Transactional
     public void record(UUID bookingId, AttendanceStatus status, UUID recordedByUserId) {
-        StudentBooking booking = studentBookingRepository.findById(bookingId)
+        StudentBooking booking = studentBookingRepository.findByIdAndTenantId(bookingId, tenantContext.getTenantId())
                 .orElseThrow(() -> new IllegalArgumentException("Reserva não encontrada"));
         User recordedBy = userRepository.findById(recordedByUserId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
@@ -53,7 +56,7 @@ public class AttendanceService {
 
     @Transactional
     public void completeSession(UUID sessionId) {
-        ClassSession session = classSessionRepository.findById(sessionId)
+        ClassSession session = classSessionRepository.findByIdAndTenantId(sessionId, tenantContext.getTenantId())
                 .orElseThrow(() -> new IllegalArgumentException("Aula não encontrada"));
         session.setStatus(SessionStatus.COMPLETED);
         classSessionRepository.save(session);
