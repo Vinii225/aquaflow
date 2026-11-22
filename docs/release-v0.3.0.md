@@ -40,7 +40,7 @@ Produto V3, entregue na Sprint #4. A plataforma passa a atender várias escolas 
   - `PaymentFlowTest`: os três status nos dois fluxos, retorno, webhook e idempotência.
 - Testes de unidade: `ProductFilterTest`, `TenantContextTest`, `MercadoPagoGatewayTest` e `WebhookVerifierTest`.
 
-> Sem `MERCADOPAGO_ACCESS_TOKEN`, o pagamento continua **simulado** e é aprovado na hora, como na v0.2.0. É assim no CI.
+> Sem `MERCADOPAGO_ACCESS_TOKEN`, o pagamento continua **simulado** e é aprovado na hora, como na v0.2.0. É assim no CI e na homologação desta versão.
 
 ## Fica para a Sprint #5
 
