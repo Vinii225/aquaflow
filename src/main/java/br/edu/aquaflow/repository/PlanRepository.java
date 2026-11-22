@@ -10,4 +10,5 @@ import java.util.UUID;
 public interface PlanRepository extends JpaRepository<Plan, UUID> {
     @EntityGraph(attributePaths = "features")
     List<Plan> findByTenantIdAndActiveTrueOrderByDisplayOrderAsc(UUID tenantId);
+    long countByTenantIdAndActiveTrue(UUID tenantId);
 }

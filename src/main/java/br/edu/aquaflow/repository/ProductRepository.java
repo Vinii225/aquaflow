@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
     List<Product> findByTenantIdAndActiveTrueOrderByDisplayOrderAsc(UUID tenantId);
+    long countByTenantIdAndActiveTrue(UUID tenantId);
 }

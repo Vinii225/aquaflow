@@ -33,7 +33,7 @@ Plataforma de gestão para escolas de natação, com várias escolas e dados sep
 | Administrador da escola | Piscinas, turmas, grade, geração de aulas, assinaturas, faturas, caixa e usuários |
 | Professor | Vê suas aulas e faz a chamada |
 | Aluno | Reserva vagas, acompanha reservas e faturas |
-| Equipe AquaFlow (plataforma) | Caixa de entrada das mensagens de contato e encaminhamento para a escola |
+| Equipe AquaFlow (plataforma) | Visão de todas as escolas lado a lado (**Escolas**) e caixa de entrada das mensagens de contato, com encaminhamento para a escola |
 
 ## Stack
 
@@ -141,6 +141,7 @@ Também dá para criar uma conta de aluno em `/register` (entra na escola padrã
 3. Professor → **Minhas aulas** → "Fazer chamada".
 4. Admin → **Faturas** → gerar as faturas do mês e registrar um pagamento.
 5. Visitante → **Planos** → "Falar com o vendedor"; depois, como Equipe AquaFlow → **Mensagens**.
+6. Equipe AquaFlow → **Escolas**: as duas escolas lado a lado, cada uma com os próprios números.
 
 ## Testes
 
@@ -209,10 +210,13 @@ Planejamento e sprints no [Trello](https://trello.com/b/EetgQnZH/aquaflow-projet
 - [x] Contratação de plano (PB-02) e carrinho/checkout da loja (PB-04), v0.2.0
 - [x] Busca e filtro no catálogo (PB-03), v0.3.0
 - [x] Pagamento online em sandbox (Mercado Pago) na contratação e na loja, v0.3.0
-- [x] Multi-escolas, fase 1: dados separados por escola (PB-09), v0.3.0
-- [ ] Multi-escolas, fase 2: cadastro de escolas e escolha da escola no login (PB-09)
-- [ ] Site público por escola em `/e/{slug}`
-- [ ] Área do aluno (PB-05)
+- [x] Multi-escolas: dados separados por escola e visão das escolas para a Equipe AquaFlow (PB-09), v0.3.0
+
+**Trabalhos futuros** (a Sprint #4 foi a última do projeto):
+
+- Cadastro de escolas pela tela e escolha da escola no login, para quem tem vínculo com mais de uma
+- Site público por escola em `/e/{slug}`
+- Área do aluno (PB-05)
 
 Notas das versões: [v0.3.0](docs/release-v0.3.0.md) · roteiro de teste da V3: [docs/roteiro-teste-v3.md](docs/roteiro-teste-v3.md)
 

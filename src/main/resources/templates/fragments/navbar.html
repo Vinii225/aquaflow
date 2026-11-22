@@ -59,6 +59,10 @@
         </li>
 
         <li class="nav-item" sec:authorize="hasRole('PLATFORM_ADMIN')">
+          <a class="nav-link" th:href="@{/plataforma/escolas}"
+             th:classappend="${#strings.startsWith(currentPath, '/plataforma/escolas')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/plataforma/escolas')} ? 'page'">Escolas</a>
+        </li>
+        <li class="nav-item" sec:authorize="hasRole('PLATFORM_ADMIN')">
           <a class="nav-link" th:href="@{/plataforma/mensagens}"
              th:classappend="${#strings.startsWith(currentPath, '/plataforma/mensagens')} ? 'active'" th:attr="aria-current=${#strings.startsWith(currentPath, '/plataforma/mensagens')} ? 'page'">Mensagens</a>
         </li>

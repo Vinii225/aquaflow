@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Escolas', null)}"></head>
+<body class="home-page">
+<div th:replace="~{fragments/navbar :: navbar}"></div>
+
+<main id="conteudo" tabindex="-1" class="container pb-5">
+  <div th:replace="~{fragments/alerts :: alerts}"></div>
+
+  <header class="dash-head">
+    <div>
+      <h1 class="checkout-title mb-1">Escolas na plataforma</h1>
+      <p class="text-muted mb-0">Cada escola vê só os próprios dados. Aqui a Equipe AquaFlow vê todas lado a lado.</p>
+    </div>
+    <a class="btn btn-outline-primary btn-sm" th:href="@{/plataforma/mensagens}">
+      <i class="bi bi-envelope me-1" aria-hidden="true"></i>Mensagens
+    </a>
+  </header>
+
+  <section class="dash-stats" aria-label="Indicadores da plataforma">
+    <div class="dash-stat">
+      <p class="dash-stat-label">Escolas ativas</p>
+      <p class="dash-stat-value" th:text="${overview.activeSchools}">2</p>
+      <p class="dash-stat-sub" th:text="${#lists.size(overview.schools)} + ' cadastradas'">2 cadastradas</p>
+    </div>
+    <div class="dash-stat">
+      <p class="dash-stat-label">Alunos</p>
+      <p class="dash-stat-value" th:text="${overview.students}">8</p>
+      <p class="dash-stat-sub">Somando as escolas</p>
+    </div>
+    <div class="dash-stat">
+      <p class="dash-stat-label">Assinaturas ativas</p>
+      <p class="dash-stat-value" th:text="${overview.activeSubscriptions}">5</p>
+      <p class="dash-stat-sub">Planos em dia</p>
+    </div>
+    <div class="dash-stat">
+      <p class="dash-stat-label">Receita do mês</p>
+      <p class="dash-stat-value" th:text="${@formats.brl(overview.monthRevenue)}">R$ 1.250,00</p>
+      <p class="dash-stat-sub">Entradas no caixa de todas as escolas</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="schools-title" class="mb-4">
+    <h2 id="schools-title" class="visually-hidden">Escolas</h2>
+    <p class="text-muted" th:if="${overview.schools.empty}">Nenhuma escola cadastrada.</p>
+
+    <div class="row g-4">
+      <div class="col-lg-6" th:each="s : ${overview.schools}">
+        <article class="card-aquaflow school-card h-100" th:with="school=${s.school}">
+          <header class="school-card-head">
+            <span class="school-avatar" aria-hidden="true" th:text="${#strings.substring(school.name, 0, 1)}">A</span>
+            <div class="school-card-title">
+              <h3 class="dash-card-title" th:text="${school.name}">AquaFlow Escola de Natação</h3>
+              <div class="d-flex flex-wrap gap-1 mt-1">
+                <span class="badge rounded-pill role-badge" th:if="${school.defaultSchool}">Escola padrão</span>
+                <span class="badge" th:classappend="'badge-status-' + ${#strings.toLowerCase(school.status)}"
+                      th:switch="${school.status.name()}">
+                  <th:block th:case="'ACTIVE'">Ativa</th:block>
+                  <th:block th:case="'SUSPENDED'">Suspensa</th:block>
+                  <th:block th:case="*">Encerrada</th:block>
+                </span>
+              </div>
+            </div>
+          </header>
+
+          <ul class="school-facts list-unstyled">
+            <li><i class="bi bi-link-45deg" aria-hidden="true"></i><span class="visually-hidden">Slug: </span><code th:text="${school.slug}">aquaflow</code></li>
+            <li th:if="${school.address}"><i class="bi bi-geo-alt" aria-hidden="true"></i><span th:text="${school.address}">Av. das Piscinas, 123</span></li>
+            <li th:if="${school.phone}"><i class="bi bi-telephone" aria-hidden="true"></i>
+              <a th:href="${school.phoneHref}" th:text="${school.phone}">(83) 99999-0000</a></li>
+            <li th:unless="${s.adminEmails.empty}"><i class="bi bi-person-badge" aria-hidden="true"></i>
+              <span><span class="visually-hidden">Administração: </span><span th:text="${#strings.listJoin(s.adminEmails, ', ')}">admin@aquaflow.com</span></span></li>
+          </ul>
+
+          <dl class="school-metrics">
+            <div class="school-metric"><dt>Alunos</dt><dd th:text="${s.students}">4</dd></div>
+            <div class="school-metric"><dt>Professores</dt><dd th:text="${s.teachers}">2</dd></div>
+            <div class="school-metric"><dt>Piscinas</dt><dd th:text="${s.pools}">2</dd></div>
+            <div class="school-metric"><dt>Turmas</dt><dd th:text="${s.classes}">3</dd></div>
+            <div class="school-metric"><dt>Planos</dt><dd th:text="${s.plans}">3</dd></div>
+            <div class="school-metric"><dt>Produtos</dt><dd th:text="${s.products}">6</dd></div>
+            <div class="school-metric"><dt>Assinaturas ativas</dt><dd th:text="${s.activeSubscriptions}">3</dd></div>
+            <div class="school-metric"><dt>Faturas em aberto</dt><dd th:text="${s.openInvoices}">1</dd></div>
+          </dl>
+
+          <footer class="school-card-foot">
+            <span>Receita do mês <strong th:text="${@formats.brl(s.monthRevenue)}">R$ 0,00</strong></span>
+            <span th:text="'Desde ' + ${#temporals.format(school.createdAt, 'dd/MM/yyyy')}">Desde 01/09/2026</span>
+          </footer>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="card-aquaflow dash-card" aria-labelledby="isolation-title">
+    <div class="dash-card-head">
+      <h2 id="isolation-title" class="dash-card-title">Como os dados de cada escola ficam separados</h2>
+    </div>
+    <ol class="isolation-steps list-unstyled mb-0">
+      <li class="isolation-step">
+        <span class="isolation-icon" aria-hidden="true"><i class="bi bi-box-arrow-in-right"></i></span>
+        <div>
+          <p class="isolation-step-title">1. Login</p>
+          <p class="isolation-step-text">O sistema guarda a escola do vínculo do usuário. Visitante sem login vê a escola padrão.</p>
+        </div>
+      </li>
+      <li class="isolation-step">
+        <span class="isolation-icon" aria-hidden="true"><i class="bi bi-funnel"></i></span>
+        <div>
+          <p class="isolation-step-title">2. Toda consulta filtra pela escola</p>
+          <p class="isolation-step-text">Piscinas, turmas, aulas, faturas, pedidos e caixa são lidos com o <code>tenant_id</code> da escola atual.</p>
+        </div>
+      </li>
+      <li class="isolation-step">
+        <span class="isolation-icon" aria-hidden="true"><i class="bi bi-shield-lock"></i></span>
+        <div>
+          <p class="isolation-step-title">3. Outra escola: 404</p>
+          <p class="isolation-step-text">Abrir pelo id um dado de outra escola responde "não encontrado". Os formulários recusam piscina, turma, professor ou aluno de fora.</p>
+        </div>
+      </li>
+    </ol>
+    <p class="small text-muted mt-3 mb-0">
+      <i class="bi bi-check2-circle me-1" aria-hidden="true"></i>Garantido por testes automáticos que rodam a cada mudança (<code>MultiTenantIsolationTest</code>).
+    </p>
+  </section>
+</main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

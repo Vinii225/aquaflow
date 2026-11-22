@@ -16,6 +16,7 @@ public interface TenantUserRepository extends JpaRepository<TenantUser, UUID> {
     List<TenantUser> findByTenantId(UUID tenantId);
     Optional<TenantUser> findByTenantIdAndUserId(UUID tenantId, UUID userId);
     Optional<TenantUser> findByIdAndTenantId(UUID id, UUID tenantId);
+    long countByTenantIdAndRoleAndStatus(UUID tenantId, TenantUserRole role, MembershipStatus status);
 
     /** Usuários com vínculo ativo na escola para o papel informado (ex.: professores para montar a grade). */
     default List<User> findActiveUsersByRole(UUID tenantId, TenantUserRole role) {
