@@ -13,4 +13,5 @@ public interface SwimClassRepository extends JpaRepository<SwimClass, UUID> {
     Page<SwimClass> findByTenantIdAndDeletedAtIsNull(UUID tenantId, Pageable pageable);
     List<SwimClass> findByTenantIdAndDeletedAtIsNull(UUID tenantId);
     Optional<SwimClass> findByIdAndTenantId(UUID id, UUID tenantId);
+    long countByTenantIdAndDeletedAtIsNull(UUID tenantId);
 }

@@ -7,7 +7,8 @@ Produto V3, entregue na Sprint #4. A plataforma passa a atender várias escolas 
 - **Multi-escolas, fase 1 (PB-09):**
   - nome, endereço, telefone e slug de cada escola vêm do banco;
   - cada usuário logado vê só os dados da escola em que tem vínculo, e o visitante vê a escola padrão;
-  - dados de demonstração com duas escolas (AquaFlow e Golfinhos Natação), cada uma com admin, professor e aluno.
+  - dados de demonstração com duas escolas (AquaFlow e Golfinhos Natação), cada uma com admin, professor e aluno;
+  - tela **Escolas** para a Equipe AquaFlow (`/plataforma/escolas`): as escolas lado a lado, com contato, administradores, alunos, piscinas, turmas, planos, produtos, assinaturas, faturas em aberto e receita do mês de cada uma.
 - **Busca e filtro na loja (PB-03):**
   - busca por nome sem diferenciar maiúsculas nem acentos ("oculos" acha "Óculos");
   - filtros por categoria e por faixa de preço, combináveis;
@@ -36,16 +37,19 @@ Produto V3, entregue na Sprint #4. A plataforma passa a atender várias escolas 
 - Novas variáveis de ambiente: `MERCADOPAGO_ACCESS_TOKEN`, `MERCADOPAGO_WEBHOOK_SECRET` e `APP_BASE_URL`.
 - Novos testes contra Postgres real:
   - `MultiTenantIsolationTest`: isolamento entre as duas escolas;
+  - `PlatformSchoolsTest`: tela Escolas, números de cada escola e acesso só da Equipe AquaFlow;
   - `StoreSearchTest`: busca, filtros e combinação;
   - `PaymentFlowTest`: os três status nos dois fluxos, retorno, webhook e idempotência.
 - Testes de unidade: `ProductFilterTest`, `TenantContextTest`, `MercadoPagoGatewayTest` e `WebhookVerifierTest`.
 
 > Sem `MERCADOPAGO_ACCESS_TOKEN`, o pagamento continua **simulado** e é aprovado na hora, como na v0.2.0. É assim no CI e na homologação desta versão.
 
-## Fica para a Sprint #5
+## Trabalhos futuros
 
-- PB-09 Multi-escolas, fase 2: tela de cadastro de escolas pela Equipe AquaFlow e escolha da escola no login, para quem tem vínculo com mais de uma.
-- Site público por escola em `/e/{slug}` (home, planos, loja e contato). Era opcional na Sprint #4 e volta ao Product Backlog.
+A Sprint #4 foi a última do projeto. Ficam como sugestão para uma continuação:
+
+- cadastro de escolas pela tela e escolha da escola no login, para quem tem vínculo com mais de uma;
+- site público por escola em `/e/{slug}` (home, planos, loja e contato), que era opcional na Sprint #4;
 - PB-05 Área do aluno.
 
 **Homologação:** https://aquaflow-9h8a.onrender.com

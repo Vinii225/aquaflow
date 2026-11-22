@@ -17,5 +17,6 @@ Tempo estimado: 10 minutos. Os logins estão no [README](../README.md#login-de-d
 | 8 | Sair e entrar como **admin da escola B** (`admin@golfinhos.com` / `admin123`) e abrir **Painel**, **Piscinas**, **Faturas** e **Caixa** | Só "Golfinhos Natação": "Piscina Coberta Golfinhos" e a fatura do "Aluno Golfinhos". **Nenhum** dado da escola A (piscinas, faturas, pedidos ou caixa dos passos 4 e 5) |
 | 9 | Entrar como **aluno da escola B** (`aluno@golfinhos.com` / `aluno123`) e abrir a **Loja** | Só os produtos da Golfinhos (ex.: "Palmar de treino") |
 | 10 | Sair e abrir a home como visitante | Escola padrão (AquaFlow), com endereço e telefone vindos do banco |
+| 11 | Entrar como **Equipe AquaFlow** (`plataforma@aquaflow.com` / `plataforma123`) e abrir **Escolas** | As duas escolas lado a lado, cada uma com endereço, telefone, administradores e os próprios números (alunos, piscinas, faturas, receita do mês). Embaixo, o resumo de como os dados ficam separados |
 
-Prints para anexar no card S4-07: passos 2, 4, 5 e 8. [preencher após a execução]
+Prints para anexar no card S4-07: passos 2, 4, 5, 8 e 11. [preencher após a execução]

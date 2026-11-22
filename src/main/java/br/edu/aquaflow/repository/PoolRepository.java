@@ -13,4 +13,5 @@ public interface PoolRepository extends JpaRepository<Pool, UUID> {
     Page<Pool> findByTenantIdAndDeletedAtIsNull(UUID tenantId, Pageable pageable);
     List<Pool> findByTenantIdAndDeletedAtIsNull(UUID tenantId);
     Optional<Pool> findByIdAndTenantId(UUID id, UUID tenantId);
+    long countByTenantIdAndDeletedAtIsNull(UUID tenantId);
 }
