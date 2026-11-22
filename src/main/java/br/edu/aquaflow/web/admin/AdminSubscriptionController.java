@@ -10,10 +10,12 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Instant;
@@ -53,7 +55,7 @@ public class AdminSubscriptionController {
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable UUID id, Model model) {
-        model.addAttribute("subscription", subscriptionRepository.findById(id).orElseThrow());
+        model.addAttribute("subscription", find(id));
         addStudents(model);
         return "admin/subscription-form";
     }
@@ -63,6 +65,11 @@ public class AdminSubscriptionController {
                         BindingResult bindingResult,
                         Model model,
                         RedirectAttributes redirectAttributes) {
+        if (subscription.getStudent() != null && tenantUserRepository
+                .findActiveUsersByRole(tenantContext.getTenantId(), TenantUserRole.STUDENT)
+                .stream().noneMatch(s -> s.getId().equals(subscription.getStudent().getId()))) {
+            bindingResult.rejectValue("student", "invalid", "Escolha um aluno da escola");
+        }
         if (bindingResult.hasErrors()) {
             addStudents(model);
             return "admin/subscription-form";
@@ -72,7 +79,7 @@ public class AdminSubscriptionController {
         if (isNew) {
             subscription.setTenant(tenantContext.getTenant());
         } else {
-            Subscription existing = subscriptionRepository.findById(subscription.getId()).orElseThrow();
+            Subscription existing = find(subscription.getId());
             subscription.setTenant(existing.getTenant());
             subscription.setCreatedAt(existing.getCreatedAt());
         }
@@ -85,12 +92,17 @@ public class AdminSubscriptionController {
 
     @PostMapping("/{id}/cancel")
     public String cancel(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
-        Subscription subscription = subscriptionRepository.findById(id).orElseThrow();
+        Subscription subscription = find(id);
         subscription.setStatus(SubscriptionStatus.CANCELED);
         subscription.setUpdatedAt(Instant.now());
         subscriptionRepository.save(subscription);
         redirectAttributes.addFlashAttribute("successMessage", "Assinatura cancelada.");
         return "redirect:/admin/subscriptions";
+    }
+
+    private Subscription find(UUID id) {
+        return subscriptionRepository.findByIdAndTenantId(id, tenantContext.getTenantId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     private void addStudents(Model model) {

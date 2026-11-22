@@ -7,10 +7,12 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.Instant;
@@ -45,7 +47,7 @@ public class AdminPoolController {
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable UUID id, Model model) {
-        Pool pool = poolRepository.findById(id).orElseThrow();
+        Pool pool = find(id);
         model.addAttribute("pool", pool);
         return "admin/pool-form";
     }
@@ -62,7 +64,7 @@ public class AdminPoolController {
         if (isNew) {
             pool.setTenant(tenantContext.getTenant());
         } else {
-            Pool existing = poolRepository.findById(pool.getId()).orElseThrow();
+            Pool existing = find(pool.getId());
             pool.setTenant(existing.getTenant());
             pool.setCreatedAt(existing.getCreatedAt());
         }
@@ -75,10 +77,16 @@ public class AdminPoolController {
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable UUID id, RedirectAttributes redirectAttributes) {
-        Pool pool = poolRepository.findById(id).orElseThrow();
+        Pool pool = find(id);
         pool.setDeletedAt(Instant.now());
         poolRepository.save(pool);
         redirectAttributes.addFlashAttribute("successMessage", "Piscina removida.");
         return "redirect:/admin/pools";
+    }
+
+    /** Só acha piscinas da escola atual: id de outra escola dá 404. */
+    private Pool find(UUID id) {
+        return poolRepository.findByIdAndTenantId(id, tenantContext.getTenantId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }

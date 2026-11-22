@@ -140,22 +140,23 @@ public class DashboardService {
 
     @Transactional(readOnly = true)
     public TeacherDashboard teacher(UUID teacherId) {
+        UUID tenantId = tenantContext.getTenantId();
         LocalDate today = LocalDate.now(ZONE);
         LocalTime now = LocalTime.now(ZONE);
 
-        List<SessionLoad> week = loads(sessionRepository.findByTeacherIdAndDateBetweenAndStatusOrderByDateAscStartTimeAsc(
-                teacherId, today, today.plusDays(6), SessionStatus.SCHEDULED));
+        List<SessionLoad> week = loads(sessionRepository.findByTenantIdAndTeacherIdAndDateBetweenAndStatusOrderByDateAscStartTimeAsc(
+                tenantId, teacherId, today, today.plusDays(6), SessionStatus.SCHEDULED));
         List<SessionLoad> todays = week.stream().filter(l -> l.session().getDate().equals(today)).toList();
 
         // Aula que já começou (ou de dias anteriores) e continua "agendada" = chamada não feita
-        List<SessionLoad> pending = loads(sessionRepository.findByTeacherIdAndDateBetweenAndStatusOrderByDateAscStartTimeAsc(
-                teacherId, today.minusDays(30), today, SessionStatus.SCHEDULED)).stream()
+        List<SessionLoad> pending = loads(sessionRepository.findByTenantIdAndTeacherIdAndDateBetweenAndStatusOrderByDateAscStartTimeAsc(
+                tenantId, teacherId, today.minusDays(30), today, SessionStatus.SCHEDULED)).stream()
                 .filter(l -> l.session().getDate().isBefore(today) || !l.session().getStartTime().isAfter(now))
                 .filter(l -> l.booked() > 0)
                 .toList();
 
         Map<AttendanceStatus, Long> attendance = new HashMap<>();
-        for (Object[] row : attendanceRepository.countByStatusForTeacherSince(teacherId, today.minusDays(30))) {
+        for (Object[] row : attendanceRepository.countByStatusForTeacherSince(tenantId, teacherId, today.minusDays(30))) {
             attendance.put((AttendanceStatus) row[0], (Long) row[1]);
         }
         long recorded = attendance.values().stream().mapToLong(Long::longValue).sum();

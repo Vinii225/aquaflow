@@ -123,7 +123,7 @@ public class PlanEnrollmentService {
 
     @Transactional(readOnly = true)
     public Optional<Confirmation> confirmation(UUID subscriptionId, UUID studentId) {
-        return subscriptionRepository.findById(subscriptionId)
+        return subscriptionRepository.findByIdAndTenantId(subscriptionId, tenantContext.getTenantId())
                 .filter(s -> s.getStudent().getId().equals(studentId))
                 .map(s -> new Confirmation(
                         s.getPlanName(),
@@ -138,7 +138,8 @@ public class PlanEnrollmentService {
     }
 
     private Optional<Subscription> activeSubscription(UUID studentId) {
-        return subscriptionRepository.findFirstByStudentIdAndStatusOrderByStartDateDesc(studentId, SubscriptionStatus.ACTIVE);
+        return subscriptionRepository.findFirstByTenantIdAndStudentIdAndStatusOrderByStartDateDesc(
+                tenantContext.getTenantId(), studentId, SubscriptionStatus.ACTIVE);
     }
 
     /** Vencimento da segunda mensalidade: o dia escolhido no mês seguinte ao da contratação. */

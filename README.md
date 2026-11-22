@@ -79,14 +79,31 @@ cp .env.example .env   # ajuste as credenciais do banco
 
 ## Login de demonstração
 
+O banco de demonstração tem duas escolas. Cada usuário vê só os dados da escola em que tem vínculo; o visitante sem login vê a escola padrão (AquaFlow).
+
+**Escola A: AquaFlow Escola de Natação** (padrão, slug `aquaflow`)
+
 | Papel | E-mail | Senha |
 | --- | --- | --- |
 | Administrador | admin@aquaflow.com | admin123 |
 | Professor | ricardo@aquaflow.com | professor123 |
 | Aluno | aluno@aquaflow.com | aluno123 |
+
+**Escola B: Golfinhos Natação** (slug `golfinhos`)
+
+| Papel | E-mail | Senha |
+| --- | --- | --- |
+| Administrador | admin@golfinhos.com | admin123 |
+| Professor | professor@golfinhos.com | professor123 |
+| Aluno | aluno@golfinhos.com | aluno123 |
+
+**Plataforma**
+
+| Papel | E-mail | Senha |
+| --- | --- | --- |
 | Equipe AquaFlow | plataforma@aquaflow.com | plataforma123 |
 
-Também dá para criar uma conta de aluno em `/register`.
+Também dá para criar uma conta de aluno em `/register` (entra na escola padrão).
 
 ### Roteiro rápido de teste
 
@@ -102,7 +119,7 @@ Também dá para criar uma conta de aluno em `/register`.
 ./mvnw verify
 ```
 
-Os testes sobem a aplicação inteira contra um PostgreSQL real com [Testcontainers](https://testcontainers.com/) (precisa de Docker rodando) e rodam todas as migrations. Eles verificam as páginas públicas (home, planos e loja com dados do banco), a proteção das áreas restritas e o login. Há também testes unitários para a lógica de tela que não depende do banco.
+Os testes sobem a aplicação inteira contra um PostgreSQL real com [Testcontainers](https://testcontainers.com/) (precisa de Docker rodando) e rodam todas as migrations. Eles verificam as páginas públicas (home, planos e loja com dados do banco), a proteção das áreas restritas, o login e o isolamento entre escolas (`MultiTenantIsolationTest`: com duas escolas no banco, uma não vê piscinas, faturas, pedidos nem mensagens da outra). Há também testes unitários para a lógica de tela que não depende do banco.
 
 ## CI/CD
 

@@ -17,9 +17,12 @@ public interface InvoiceRepository extends JpaRepository<Invoice, UUID> {
     List<Invoice> findBySubscriptionIdOrderByReferenceMonthDesc(UUID subscriptionId);
     Optional<Invoice> findBySubscriptionIdAndReferenceMonth(UUID subscriptionId, LocalDate referenceMonth);
 
+    Optional<Invoice> findByIdAndTenantId(UUID id, UUID tenantId);
+
     @org.springframework.data.jpa.repository.Query(
-        "select i from Invoice i where i.subscription.student.id = :studentId order by i.referenceMonth desc")
-    List<Invoice> findByStudentId(UUID studentId);
+        "select i from Invoice i where i.tenant.id = :tenantId and i.subscription.student.id = :studentId " +
+        "order by i.referenceMonth desc")
+    List<Invoice> findByTenantIdAndStudentId(UUID tenantId, UUID studentId);
 
     long countByTenantIdAndStatus(UUID tenantId, InvoiceStatus status);
 

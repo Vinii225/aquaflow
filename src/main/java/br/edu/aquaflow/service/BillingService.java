@@ -74,7 +74,7 @@ public class BillingService {
 
     @Transactional
     public void registerPayment(UUID invoiceId, String paymentMethod, UUID registeredByUserId) {
-        Invoice invoice = invoiceRepository.findById(invoiceId)
+        Invoice invoice = invoiceRepository.findByIdAndTenantId(invoiceId, tenantContext.getTenantId())
                 .orElseThrow(() -> new IllegalArgumentException("Fatura não encontrada"));
         registerIncome(invoice.getTenant(), "tuition", "invoice", invoice.getId(),
                 invoice.getAmount(), paymentMethod, registeredByUserId);

@@ -14,7 +14,7 @@ public interface AttendanceRepository extends JpaRepository<Attendance, UUID> {
 
     /** Presenças registradas pelo professor desde a data: cada linha é [status, quantidade]. */
     @Query("select a.status, count(a) from Attendance a " +
-           "where a.studentBooking.classSession.teacher.id = :teacherId " +
+           "where a.tenant.id = :tenantId and a.studentBooking.classSession.teacher.id = :teacherId " +
            "and a.studentBooking.classSession.date >= :from group by a.status")
-    List<Object[]> countByStatusForTeacherSince(UUID teacherId, LocalDate from);
+    List<Object[]> countByStatusForTeacherSince(UUID tenantId, UUID teacherId, LocalDate from);
 }

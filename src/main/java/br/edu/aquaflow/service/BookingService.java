@@ -19,13 +19,16 @@ public class BookingService {
     private final StudentBookingRepository studentBookingRepository;
     private final ClassSessionRepository classSessionRepository;
     private final UserRepository userRepository;
+    private final TenantContext tenantContext;
 
     public BookingService(StudentBookingRepository studentBookingRepository,
                            ClassSessionRepository classSessionRepository,
-                           UserRepository userRepository) {
+                           UserRepository userRepository,
+                           TenantContext tenantContext) {
         this.studentBookingRepository = studentBookingRepository;
         this.classSessionRepository = classSessionRepository;
         this.userRepository = userRepository;
+        this.tenantContext = tenantContext;
     }
 
     public static class SessionFullException extends RuntimeException {
@@ -42,7 +45,7 @@ public class BookingService {
 
     @Transactional
     public StudentBooking book(UUID studentId, UUID sessionId) {
-        ClassSession session = classSessionRepository.findById(sessionId)
+        ClassSession session = classSessionRepository.findByIdAndTenantId(sessionId, tenantContext.getTenantId())
                 .orElseThrow(() -> new IllegalArgumentException("Aula não encontrada"));
         User student = userRepository.findById(studentId)
                 .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
@@ -67,7 +70,7 @@ public class BookingService {
 
     @Transactional
     public void cancel(UUID bookingId, UUID studentId) {
-        StudentBooking booking = studentBookingRepository.findById(bookingId)
+        StudentBooking booking = studentBookingRepository.findByIdAndTenantId(bookingId, tenantContext.getTenantId())
                 .orElseThrow(() -> new IllegalArgumentException("Reserva não encontrada"));
         if (!booking.getStudent().getId().equals(studentId)) {
             throw new IllegalStateException("Esta reserva não pertence a este aluno");

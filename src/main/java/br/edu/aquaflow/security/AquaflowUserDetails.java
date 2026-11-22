@@ -13,15 +13,22 @@ import java.util.stream.Collectors;
 public class AquaflowUserDetails implements UserDetails {
 
     private final User user;
+    private final UUID tenantId;
     private final Set<String> roles;
 
-    public AquaflowUserDetails(User user, Set<String> roles) {
+    public AquaflowUserDetails(User user, UUID tenantId, Set<String> roles) {
         this.user = user;
+        this.tenantId = tenantId;
         this.roles = roles;
     }
 
     public UUID getUserId() {
         return user.getId();
+    }
+
+    /** Escola do usuário nesta sessão (definida no login, pelo vínculo em tenant_users). */
+    public UUID getTenantId() {
+        return tenantId;
     }
 
     public String getFullName() {
