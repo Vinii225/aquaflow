@@ -11,6 +11,7 @@ import br.edu.aquaflow.repository.InvoiceRepository;
 import br.edu.aquaflow.repository.PlanRepository;
 import br.edu.aquaflow.repository.SubscriptionRepository;
 import br.edu.aquaflow.repository.UserRepository;
+import br.edu.aquaflow.service.payment.PaymentService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +24,9 @@ import java.util.UUID;
 
 /**
  * Contratação de plano pelo próprio aluno (PB-02): cria a assinatura, gera a fatura do mês
- * e registra o pagamento dela no caixa. O pagamento ainda é simulado: o time não definiu o
- * meio de pagamento real, então a primeira mensalidade é dada como paga na hora.
+ * e cobra a primeira mensalidade pelo {@link PaymentService} (Mercado Pago em sandbox ou
+ * pagamento simulado). Aprovado: fatura paga. Pendente: fatura em aberto. Recusado: fatura e
+ * assinatura canceladas, e o aluno pode tentar de novo.
  */
 @Service
 public class PlanEnrollmentService {
@@ -35,25 +37,41 @@ public class PlanEnrollmentService {
     private final SubscriptionRepository subscriptionRepository;
     private final InvoiceRepository invoiceRepository;
     private final UserRepository userRepository;
-    private final BillingService billingService;
+    private final PaymentService paymentService;
     private final TenantContext tenantContext;
 
     public PlanEnrollmentService(PlanRepository planRepository,
                                  SubscriptionRepository subscriptionRepository,
                                  InvoiceRepository invoiceRepository,
                                  UserRepository userRepository,
-                                 BillingService billingService,
+                                 PaymentService paymentService,
                                  TenantContext tenantContext) {
         this.planRepository = planRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.invoiceRepository = invoiceRepository;
         this.userRepository = userRepository;
-        this.billingService = billingService;
+        this.paymentService = paymentService;
         this.tenantContext = tenantContext;
     }
 
     public record Confirmation(String planName, BigDecimal monthlyFee, int dueDay,
-                               LocalDate startDate, LocalDate nextDueDate, String firstInvoiceStatus) {
+                               LocalDate startDate, LocalDate nextDueDate, InvoiceStatus firstInvoice) {
+
+        public String getFirstInvoiceStatus() {
+            return firstInvoice == null ? null : firstInvoice.getLabel();
+        }
+
+        public boolean isPaid() {
+            return firstInvoice == InvoiceStatus.PAID;
+        }
+
+        public boolean isRejected() {
+            return firstInvoice == InvoiceStatus.CANCELED;
+        }
+    }
+
+    /** Assinatura criada e, se o pagamento é no gateway, para onde mandar o aluno. */
+    public record Enrollment(UUID subscriptionId, String paymentRedirectUrl) {
     }
 
     public static class AlreadySubscribedException extends RuntimeException {
@@ -82,8 +100,9 @@ public class PlanEnrollmentService {
         return activeSubscription(studentId).map(Subscription::getPlanName);
     }
 
+    /** @param baseUrl endereço público do site, para o gateway devolver o aluno e notificar */
     @Transactional
-    public UUID enroll(UUID studentId, UUID planId, int dueDay, PaymentMethod paymentMethod) {
+    public Enrollment enroll(UUID studentId, UUID planId, int dueDay, PaymentMethod paymentMethod, String baseUrl) {
         if (!DUE_DAYS.contains(dueDay)) {
             throw new IllegalArgumentException("Dia de vencimento inválido");
         }
@@ -117,8 +136,8 @@ public class PlanEnrollmentService {
         invoice.setStatus(InvoiceStatus.OPEN);
         invoiceRepository.save(invoice);
 
-        billingService.registerPayment(invoice.getId(), paymentMethod.getCode(), studentId);
-        return subscription.getId();
+        PaymentService.Start payment = paymentService.startInvoice(invoice, paymentMethod, student, baseUrl);
+        return new Enrollment(subscription.getId(), payment.redirectUrl());
     }
 
     @Transactional(readOnly = true)
@@ -133,7 +152,7 @@ public class PlanEnrollmentService {
                         nextDueDate(s.getStartDate(), s.getDueDay()),
                         invoiceRepository.findBySubscriptionIdOrderByReferenceMonthDesc(s.getId()).stream()
                                 .findFirst()
-                                .map(i -> i.getStatus().getLabel())
+                                .map(Invoice::getStatus)
                                 .orElse(null)));
     }
 

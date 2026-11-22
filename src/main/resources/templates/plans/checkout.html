@@ -51,7 +51,9 @@
 
         <div class="alert alert-info small d-flex gap-2 mb-4" role="note">
           <i class="bi bi-info-circle" aria-hidden="true"></i>
-          <span>Ambiente de homologação: o pagamento é <strong>simulado</strong> e nenhuma cobrança real é feita.</span>
+          <span th:if="${onlinePayment}">Você vai para o <strong>Mercado Pago</strong> para pagar com Pix, cartão ou boleto.
+            Ambiente de teste: use os cartões de teste do Mercado Pago, nenhuma cobrança real é feita.</span>
+          <span th:unless="${onlinePayment}">Ambiente de homologação: o pagamento é <strong>simulado</strong> e nenhuma cobrança real é feita.</span>
         </div>
 
         <div class="form-check mb-4">

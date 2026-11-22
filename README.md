@@ -76,6 +76,35 @@ cp .env.example .env   # ajuste as credenciais do banco
 | `FLYWAY_BASELINE_VERSION` | `2` | Versão assumida para um banco já populado sem histórico do Flyway |
 | `SHOW_SQL` | `false` | Loga as queries do Hibernate |
 | `THYMELEAF_CACHE` | `false` | Use `true` em produção |
+| `MERCADOPAGO_ACCESS_TOKEN` | vazio | Access Token de **teste** do Mercado Pago. Vazio = pagamento simulado |
+| `MERCADOPAGO_WEBHOOK_SECRET` | vazio | Assinatura secreta do webhook, para conferir o `x-signature` das notificações |
+| `APP_BASE_URL` | vazio | URL pública com https (ex.: `https://aquaflow-9h8a.onrender.com`), usada nas URLs de retorno e no webhook |
+
+Chaves e segredos ficam só em variáveis de ambiente (Render) e GitHub Secrets, nunca no repositório.
+
+### Pagamento online (Mercado Pago em modo de teste)
+
+A contratação de plano e o checkout da loja cobram pelo **Mercado Pago Checkout Pro** (Pix, cartão e boleto) quando `MERCADOPAGO_ACCESS_TOKEN` está definida. Sem ela, o pagamento é **simulado** e aprovado na hora, como nas sprints anteriores (é assim no CI e nos testes).
+
+| Status no Mercado Pago | Fatura (plano) | Pedido (loja) |
+| --- | --- | --- |
+| aprovado | Paga, com entrada no caixa | Pago, com entrada no caixa |
+| pendente / em análise | Em aberto | Aguardando pagamento |
+| recusado / cancelado | Cancelada, e a assinatura também (o aluno pode contratar de novo) | Pagamento recusado (os itens voltam ao carrinho) |
+
+O status é atualizado de dois jeitos, sempre consultando a API do Mercado Pago (nunca só pelos parâmetros da URL):
+
+- **Retorno do aluno** (`/pagamentos/retorno/sucesso|pendente|falha`);
+- **Webhook** `POST {APP_BASE_URL}/pagamentos/webhook/mercadopago`, com a assinatura conferida pelo validador oficial do SDK. Notificações repetidas não lançam o caixa duas vezes.
+
+Cada tentativa fica em `gateway_payments`. O id dela vai como `external_reference` e liga o pagamento à fatura ou pedido e à escola.
+
+**Como testar no sandbox** (o Mercado Pago não aceita `localhost` nas URLs de retorno, então use a homologação no Render):
+
+1. No [painel de desenvolvedor](https://www.mercadopago.com.br/developers/panel/app), crie uma aplicação (Checkout Pro) e, em **Contas de teste**, um vendedor e um comprador.
+2. Com o vendedor de teste, copie o **Access Token** das credenciais e salve como `MERCADOPAGO_ACCESS_TOKEN` no Render. Salve também `APP_BASE_URL`.
+3. Em **Webhooks > Configurar notificações**, cadastre `{APP_BASE_URL}/pagamentos/webhook/mercadopago` com o evento **Pagamentos** e salve a assinatura secreta como `MERCADOPAGO_WEBHOOK_SECRET`.
+4. Pague logado com o comprador de teste, usando um [cartão de teste](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro/additional-content/test-cards) (ex.: Mastercard `5480 8328 0103 3311`, CVV `123`, validade `11/30`, CPF `12345678909`). O nome do titular define o resultado: `APRO` aprova, `CONT` deixa pendente, `OTHE` recusa.
 
 ## Login de demonstração
 

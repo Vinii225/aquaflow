@@ -300,6 +300,7 @@ body > main {
 }
 
 .badge-status-canceled,
+.badge-status-rejected,
 .badge-status-inactive,
 .badge-status-closed {
   background-color: var(--color-danger);
@@ -747,6 +748,17 @@ a {
   background-color: rgba(22, 163, 74, 0.12);
   color: var(--color-success);
   font-size: 2rem;
+}
+
+/* Pagamento em análise ou recusado (retorno do Mercado Pago) */
+.confirmation-icon-pending {
+  background-color: rgba(37, 99, 235, 0.12);
+  color: var(--color-secondary);
+}
+
+.confirmation-icon-error {
+  background-color: rgba(220, 38, 38, 0.12);
+  color: var(--color-danger);
 }
 
 .contact-modal {

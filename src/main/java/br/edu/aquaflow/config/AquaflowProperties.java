@@ -12,8 +12,28 @@ import org.springframework.validation.annotation.Validated;
  */
 @Validated
 @ConfigurationProperties(prefix = "aquaflow")
-public record AquaflowProperties(@Valid Booking booking) {
+public record AquaflowProperties(@Valid Booking booking, @Valid Payment payment) {
 
     public record Booking(@Min(1) int sessionGenerationWeeksAhead) {
+    }
+
+    /**
+     * Pagamento online (S4-06). Tudo vem de variáveis de ambiente; vazio = pagamento simulado.
+     *
+     * @param publicBaseUrl URL pública do site (ex.: https://aquaflow-9h8a.onrender.com), usada nas
+     *                      back_urls e no webhook. Vazia: usa o endereço da própria requisição e não envia webhook.
+     */
+    public record Payment(String publicBaseUrl, MercadoPago mercadoPago) {
+
+        public MercadoPago mercadoPago() {
+            return mercadoPago == null ? new MercadoPago(null, null) : mercadoPago;
+        }
+    }
+
+    public record MercadoPago(String accessToken, String webhookSecret) {
+
+        public boolean isEnabled() {
+            return accessToken != null && !accessToken.isBlank();
+        }
     }
 }
