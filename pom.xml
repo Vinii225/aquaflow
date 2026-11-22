@@ -13,7 +13,7 @@
 
     <groupId>br.edu.aquaflow</groupId>
     <artifactId>aquaflow</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <name>aquaflow</name>
     <description>AquaFlow - sistema de gestao para escola de natacao</description>
 
